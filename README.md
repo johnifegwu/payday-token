@@ -1,4 +1,9 @@
 # payday-token
+
+Contract: EQBGGZp3hbLIzr3GmM37mT-7tjP1lCgrBEzSa7AYCxPAFPHW
+https://tonviewer.com/EQBGGZp3hbLIzr3GmM37mT-7tjP1lCgrBEzSa7AYCxPAFPHW?section=code
+
+
 PayDay Token White Paper
 Introduction
 PayDay Token (PDAY) is a new cryptocurrency launched on The Open Network (TON) blockchain, designed to create value for community members while promoting fair distribution of wealth. The token is centered around a mission to empower the LinkedIn community, enabling users to participate in the digital economy by offering ownership and trading opportunities with the goal of providing a modern, decentralized solution for paying employees on payday.

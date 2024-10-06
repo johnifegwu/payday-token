@@ -4,9 +4,9 @@ from bs4 import BeautifulSoup
 import json
 
 # LinkedIn API credentials
-CLIENT_ID = 'YOUR_CLIENT_ID'
-CLIENT_SECRET = 'YOUR_CLIENT_SECRET'
-REDIRECT_URI = 'YOUR_REDIRECT_URL'
+CLIENT_ID = 'PayDay_CLIENT_ID'
+CLIENT_SECRET = 'PayDay_CLIENT_SECRET'
+REDIRECT_URI = 'PayDay_REDIRECT_URL'
 POST_URN = 'urn:li:share:7248352321326247936'  # PayDay LinkedIn post URN
 ACCESS_TOKEN = ''  # Fill this after you get the token manually for first-time use
 

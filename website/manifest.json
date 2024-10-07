@@ -1,0 +1,8 @@
+{
+    "manifest_version": 1,
+    "version": "1.0.0",
+    "name": "PayDay Token",
+    "icon_url": "https://paydaytoken.online/images/payday.png",
+    "terms_of_service_url": "https://paydaytoken.online/terms.html",
+    "privacy_policy_url": "https://paydaytoken.online/privacy.html"
+}

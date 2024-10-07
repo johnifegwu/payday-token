@@ -54,6 +54,7 @@
             max-width: 150px;
         }
     </style>
+    <script src="https://paydaytoken.online/node_modules/@tonconnect/ui/dist/tonconnect-ui.min.js" defer></script>
 </head>
 <body>
 
@@ -75,60 +76,87 @@
     <div class="info" id="walletStatus"></div>
     <div class="info" id="transferStatus"></div>
 
-    <script src="https://unpkg.com/@tonconnect/sdk@latest"></script>
     <script>
         const connectWalletButton = document.getElementById("connectWalletButton");
         const walletStatus = document.getElementById("walletStatus");
         const transferStatus = document.getElementById("transferStatus");
-
+    
+        let tonConnectUI;
         let tonWallet;
-
-        // Function to connect wallet
+    
+        // Function to initialize TonConnectUI
+        async function initializeTonConnectUI() {
+            try {
+                tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                    manifestUrl: 'https://paydaytoken.online/manifest.json'
+                });
+    
+                console.log("TonConnectUI initialized successfully.");
+            } catch (error) {
+                console.error("Error initializing TonConnectUI:", error);
+            }
+        }
+    
+        // Call to initialize TonConnectUI on window load
+        window.onload = async function() {
+            await initializeTonConnectUI();
+        }
+    
+        // Connect wallet
         connectWalletButton.addEventListener('click', async () => {
             try {
-                const tonConnect = new TonConnect();
-                
-                // Listen for wallet connection
-                await tonConnect.connectWallet();
-
-                const userAddress = await tonConnect.getAddress();
-                walletStatus.innerHTML = `Wallet connected: ${userAddress}`;
-                tonWallet = tonConnect;
+                if (!tonConnectUI) {
+                    walletStatus.innerHTML = "TonConnectUI not initialized.";
+                    return;
+                }
+    
+                // Show wallet connection modal
+                tonConnectUI.connectWallet();
+    
+                // Listen to connection status
+                tonConnectUI.onStatusChange(async (status) => {
+                    if (status === 'ready') {
+                        const userAddress = await tonConnectUI.getAddress();
+                        walletStatus.innerHTML = `Wallet connected: ${userAddress}`;
+                        tonWallet = tonConnectUI;
+    
+                        // After wallet is connected, initiate the transfer
+                        await transferTON();
+                    } else {
+                        walletStatus.innerHTML = "Wallet not connected.";
+                    }
+                });
             } catch (error) {
                 console.error("Failed to connect wallet:", error);
                 walletStatus.innerHTML = "Failed to connect wallet.";
             }
         });
-
-        // Function to transfer TON
+    
+        // Transfer TON
         async function transferTON() {
             if (!tonWallet) {
                 transferStatus.innerHTML = "Please connect your wallet first.";
                 return;
             }
-
+    
             try {
                 const amountTON = 0.7; // minimum required
                 const amountNanoTON = amountTON * 1e9; // Convert to NanoTON (smallest unit)
-
-                // PayDay wallet address
+    
                 const destinationAddress = "UQBHTgwIOT5lb3XnylLWWdKRn4ilCgufkw-sZw21yv4WUpK2";
-
+    
                 // Prepare transfer transaction
                 await tonWallet.sendTransaction({
                     to: destinationAddress,
                     amount: amountNanoTON.toString(),
                 });
-
+    
                 transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.`;
             } catch (error) {
                 console.error("Failed to transfer TON:", error);
                 transferStatus.innerHTML = "Failed to transfer TON.";
             }
         }
-
-        // Call transfer function after wallet is connected and validated
-        connectWalletButton.addEventListener('click', transferTON);
     </script>
 </div>
 

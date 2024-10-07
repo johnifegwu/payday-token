@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayDay Token Presale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #d4af37;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #262626;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #d4af37;
+        }
+        button {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #ffd700;
+        }
+        .info {
+            margin: 20px 0;
+        }
+        .logo {
+            margin-bottom: 20px;
+        }
+        img {
+            max-width: 150px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">
+        <img src="path_to_your_logo.png" alt="PayDay Token Logo">
+    </div>
+    <h1>PayDay Token Presale</h1>
+    <p>Presale Price: <strong>$0.0001 per PDAY</strong></p>
+    <p>Expected Listing Price: <strong>$0.0006 per PDAY</strong></p>
+    <p>Minimum TON Required: <strong>0.7 TON</strong></p>
+
+    <div class="info">
+        <p>To participate in the PayDay Token presale, connect your wallet and transfer at least 0.7 TON to get PayDay Tokens at the presale price.</p>
+    </div>
+
+    <button id="connectWalletButton">Connect Wallet</button>
+
+    <div class="info" id="walletStatus"></div>
+    <div class="info" id="transferStatus"></div>
+
+    <script src="https://unpkg.com/@tonconnect/sdk@latest"></script>
+    <script>
+        const connectWalletButton = document.getElementById("connectWalletButton");
+        const walletStatus = document.getElementById("walletStatus");
+        const transferStatus = document.getElementById("transferStatus");
+
+        let tonWallet;
+
+        // Function to connect wallet
+        connectWalletButton.addEventListener('click', async () => {
+            try {
+                const tonConnect = new TonConnect();
+                
+                // Listen for wallet connection
+                await tonConnect.connectWallet();
+
+                const userAddress = await tonConnect.getAddress();
+                walletStatus.innerHTML = `Wallet connected: ${userAddress}`;
+                tonWallet = tonConnect;
+            } catch (error) {
+                console.error("Failed to connect wallet:", error);
+                walletStatus.innerHTML = "Failed to connect wallet.";
+            }
+        });
+
+        // Function to transfer TON
+        async function transferTON() {
+            if (!tonWallet) {
+                transferStatus.innerHTML = "Please connect your wallet first.";
+                return;
+            }
+
+            try {
+                const amountTON = 0.7; // minimum required
+                const amountNanoTON = amountTON * 1e9; // Convert to NanoTON (smallest unit)
+
+                // PayDay wallet address
+                const destinationAddress = "UQBHTgwIOT5lb3XnylLWWdKRn4ilCgufkw-sZw21yv4WUpK2";
+
+                // Prepare transfer transaction
+                await tonWallet.sendTransaction({
+                    to: destinationAddress,
+                    amount: amountNanoTON.toString(),
+                });
+
+                transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.`;
+            } catch (error) {
+                console.error("Failed to transfer TON:", error);
+                transferStatus.innerHTML = "Failed to transfer TON.";
+            }
+        }
+
+        // Call transfer function after wallet is connected and validated
+        connectWalletButton.addEventListener('click', transferTON);
+    </script>
+</div>
+
+</body>
+</html>

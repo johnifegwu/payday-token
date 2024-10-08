@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://paydaytoken.online/images/paydayicon.png" type="image/png">
     <title>PayDay Token Presale</title>
     <style>
         body {
@@ -14,24 +16,49 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            flex-direction: column;
+            overflow-x: hidden;
         }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            min-height: 100vh;
+            /* Ensure the content fills the height of the screen */
+        }
+
         .container {
             background-color: #262626;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            width: 100%;
+            width: 90%;
             max-width: 600px;
             text-align: center;
         }
+
+        .links {
+            margin-top: 35px;
+            font-size: 14px;
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+
         h1 {
             color: #ffcc00;
             margin-bottom: 20px;
         }
+
         p {
             color: #d4af37;
         }
+
         button {
             background-color: #ffcc00;
             color: #1a1a1a;
@@ -40,125 +67,224 @@
             border-radius: 5px;
             cursor: pointer;
             margin: 10px 0;
+            width: 100%;
+            max-width: 250px;
         }
+
         button:hover {
             background-color: #ffd700;
         }
+
         .info {
             margin: 20px 0;
         }
+
         .logo {
             margin-bottom: 20px;
+            max-width: 50%;
+            /* Maximum width of the logo */
+            height: auto;
+            /* Maintain aspect ratio */
+            display: block;
+            /* Make the logo a block element */
+            margin-left: auto;
+            /* Center the logo by auto margins */
+            margin-right: auto;
+            /* Center the logo by auto margins */
+            text-align: center;
+            /* Optional: center text if needed */
         }
+
+
         img {
-            max-width: 150px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .links a {
+            color: #ffcc00;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+                padding: 40px;
+            }
+
+            .container {
+                padding: 40px;
+            }
+
+            button {
+                width: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+
+            button {
+                font-size: 1em;
+            }
+
+            .links a {
+                font-size: 12px;
+            }
         }
     </style>
+    <!-- <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" defer></script> -->
     <script src="https://paydaytoken.online/node_modules/@tonconnect/ui/dist/tonconnect-ui.min.js" defer></script>
 </head>
+
 <body>
 
-<div class="container">
-    <div class="logo">
-        <img src="images/payday.png" alt="PayDay Token Logo">
-    </div>
-    <h1>PayDay Token Presale</h1>
-    <p>Presale Price: <strong>$0.0001 per PDAY</strong></p>
-    <p>Expected Listing Price: <strong>$0.0006 per PDAY</strong></p>
-    <p>Minimum TON Required: <strong>0.7 TON</strong></p>
+    <div class="container">
+        <div class="logo">
+            <img src="images/payday.png" alt="PayDay Token Logo">
+        </div>
+        <h1>PayDay Token Presale</h1>
+        <p>Presale Price: <strong>$0.0001 per PDAY</strong></p>
+        <p>Expected Listing Price: <strong>$0.0006 per PDAY</strong></p>
+        <p>Minimum TON Required: <strong>0.7 TON</strong></p>
 
-    <div class="info">
-        <p>To participate in the PayDay Token presale, connect your wallet and transfer at least 0.7 TON to get PayDay Tokens at the presale price.</p>
-    </div>
+        <div class="info">
+            <p>To participate in the PayDay Token presale, connect your wallet and transfer at least 0.7 TON to get
+                PayDay Tokens at the presale price.</p>
+        </div>
 
-    <button id="connectWalletButton">Connect Wallet</button>
+        <button id="connectWalletButton">Connect Wallet</button>
 
-    <div class="info" id="walletStatus"></div>
-    <div class="info" id="transferStatus"></div>
+        <div class="info">
+            <h3>Why Join the Presale?</h3>
+            <p>Join the PayDay Token Presale – Your Gateway to a New Era of Digital Payroll Solutions!</p>
+            <p>Don’t miss your chance to participate in the exclusive PayDay Token presale and secure your spot in a
+                project designed to revolutionize payroll systems. With <strong>tokens available at just
+                    $0.0001</strong>, early adopters have the opportunity to benefit from <strong>projected listing
+                    gains</strong> and support the development of a decentralized payment solution that brings instant,
+                cross-border payments and low fees to businesses worldwide.</p>
+            <p>Backed by a growing community of LinkedIn users and a clear roadmap for exchange listings and business
+                integration, PayDay Token is not just a cryptocurrency – it’s a movement to empower employees and
+                companies with fast, secure, and scalable payroll solutions. Be part of the future today!</p>
+            <p><strong>Limited tokens are available!</strong> Act now and take advantage of this early opportunity
+                before PayDay Token reaches the broader market.</p>
+        </div>
 
-    <script>
-        const connectWalletButton = document.getElementById("connectWalletButton");
-        const walletStatus = document.getElementById("walletStatus");
-        const transferStatus = document.getElementById("transferStatus");
-    
-        let tonConnectUI;
-        let tonWallet;
-    
-        // Function to initialize TonConnectUI
-        async function initializeTonConnectUI() {
-            try {
-                tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                    manifestUrl: 'https://paydaytoken.online/manifest.json'
-                });
-    
-                console.log("TonConnectUI initialized successfully.");
-            } catch (error) {
-                console.error("Error initializing TonConnectUI:", error);
+        <button id="connectWalletButton2">Connect Wallet</button>
+
+        <div class="info" id="walletStatus"></div>
+        <div class="info" id="transferStatus"></div>
+
+        <script>
+            function redirectToRateLimiter() {
+                // Redirect to the CGI rate limiter on page load
+                window.location.href = "/cgi-bin/rate_limiter.cgi";
             }
-        }
-    
-        // Call to initialize TonConnectUI on window load
-        window.onload = async function() {
-            await initializeTonConnectUI();
-        }
-    
-        // Connect wallet
-        connectWalletButton.addEventListener('click', async () => {
-            try {
-                if (!tonConnectUI) {
-                    walletStatus.innerHTML = "TonConnectUI not initialized.";
+
+            // Call the function as soon as the page loads
+            window.onload = redirectToRateLimiter;
+
+            const connectWalletButton = document.getElementById("connectWalletButton");
+            const connectWalletButton2 = document.getElementById("connectWalletButton2");
+            const walletStatus = document.getElementById("walletStatus");
+            const transferStatus = document.getElementById("transferStatus");
+
+            let tonConnectUI;
+            let tonWallet;
+
+            async function initializeTonConnectUI() {
+                try {
+                    tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                        manifestUrl: 'https://paydaytoken.online/tonconnect-manifest.json' // ,buttonRootId: 'connectWalletButton'
+                    });
+
+                    console.log("TonConnectUI initialized successfully.");
+                } catch (error) {
+                    console.error("Error initializing TonConnectUI:", error);
+                }
+            }
+
+            window.onload = async function () {
+                await initializeTonConnectUI();
+            }
+
+            async function connectWallet() {
+                try {
+                    if (!tonConnectUI) {
+                        walletStatus.innerHTML = "TonConnectUI not initialized.";
+                        return;
+                    }
+
+                    tonConnectUI.disconnect(); // we try to disconnect here first just in case the user connected before
+                    const connectedWallet = await tonConnectUI.connectWallet();
+
+                    tonConnectUI.onStatusChange(async (status) => {
+                        if (status === 'ready') {
+                            const userAddress = await tonConnectUI.getAddress();
+                            walletStatus.innerHTML = `Wallet connected: ${userAddress}`;
+                            tonWallet = tonConnectUI;
+
+                            // Call transferTON only after the wallet is connected
+                            await transferTON();
+                        } else {
+                            walletStatus.innerHTML = "Wallet not connected.";
+                        }
+                    });
+
+                    console.log(connectedWallet);
+
+                } catch (error) {
+                    console.error("Failed to connect wallet:", error);
+                    walletStatus.innerHTML = "Failed to connect wallet.";
+                }
+            }
+
+            connectWalletButton.addEventListener('click', connectWallet);
+            connectWalletButton2.addEventListener('click', connectWallet);
+
+            async function transferTON() {
+                if (!tonWallet) {
+                    transferStatus.innerHTML = "Please connect your wallet first.";
                     return;
                 }
-    
-                // Show wallet connection modal
-                tonConnectUI.connectWallet();
-    
-                // Listen to connection status
-                tonConnectUI.onStatusChange(async (status) => {
-                    if (status === 'ready') {
-                        const userAddress = await tonConnectUI.getAddress();
-                        walletStatus.innerHTML = `Wallet connected: ${userAddress}`;
-                        tonWallet = tonConnectUI;
-    
-                        // After wallet is connected, initiate the transfer
-                        await transferTON();
-                    } else {
-                        walletStatus.innerHTML = "Wallet not connected.";
-                    }
-                });
-            } catch (error) {
-                console.error("Failed to connect wallet:", error);
-                walletStatus.innerHTML = "Failed to connect wallet.";
+
+                try {
+                    const amountTON = 0.7;
+                    const amountNanoTON = amountTON * 1e9;
+
+                    const destinationAddress = "UQBHTgwIOT5lb3XnylLWWdKRn4ilCgufkw-sZw21yv4WUpK2";
+
+                    await tonWallet.sendTransaction({
+                        to: destinationAddress,
+                        amount: amountNanoTON.toString(),
+                    });
+
+                    transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.`;
+                } catch (error) {
+                    console.error("Failed to transfer TON:", error);
+                    transferStatus.innerHTML = "Failed to transfer TON.";
+                }
             }
-        });
-    
-        // Transfer TON
-        async function transferTON() {
-            if (!tonWallet) {
-                transferStatus.innerHTML = "Please connect your wallet first.";
-                return;
-            }
-    
-            try {
-                const amountTON = 0.7; // minimum required
-                const amountNanoTON = amountTON * 1e9; // Convert to NanoTON (smallest unit)
-    
-                const destinationAddress = "UQBHTgwIOT5lb3XnylLWWdKRn4ilCgufkw-sZw21yv4WUpK2";
-    
-                // Prepare transfer transaction
-                await tonWallet.sendTransaction({
-                    to: destinationAddress,
-                    amount: amountNanoTON.toString(),
-                });
-    
-                transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.`;
-            } catch (error) {
-                console.error("Failed to transfer TON:", error);
-                transferStatus.innerHTML = "Failed to transfer TON.";
-            }
-        }
-    </script>
-</div>
+        </script>
+        <div class="links">
+            <a href="https://paydaytoken.online/whitepaper.pdf" target="_blank">Whitepaper</a> |
+            <a href="https://x.com/token_payday?t=c9pgwx_ikva8vBwWTNm8EA&s=09" target="_blank">Twitter</a> |
+            <a href="https://www.linkedin.com/company/payday-token/?viewAsMember=true" target="_blank">LinkedIn</a>
+        </div>
+    </div>
 
 </body>
+
 </html>

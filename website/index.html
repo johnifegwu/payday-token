@@ -220,7 +220,7 @@
             }
 
             window.onload = async function () {
-                 await redirectToRateLimiter(); // Call rate limiter first
+                await redirectToRateLimiter(); // Call rate limiter first
                 await initializeTonConnectUI();
             }
 
@@ -231,14 +231,7 @@
                         return;
                     }
 
-                    //tonConnectUI.disconnect(); // we try to disconnect here first just in case the user connected before
-                    // Check if a wallet is already connected
-                    const isConnected = await tonConnectUI.isConnected();
-                    if (isConnected) {
-                        // Disconnect the current wallet
-                        await tonConnectUI.disconnect();
-                        walletStatus.innerHTML = "Previous wallet disconnected.";
-                    }
+                    tonConnectUI.disconnect(); // we try to disconnect here first just in case the user connected before
                     const connectedWallet = await tonConnectUI.connectWallet();
 
                     tonConnectUI.onStatusChange(async (status) => {

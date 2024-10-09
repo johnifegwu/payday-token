@@ -5,10 +5,10 @@ use Toncenter\ToncenterApi;
 require_once 'vendor/autoload.php'; 
 
 // Database Connection
-$servername = "your_database_server";
-$username = "your_database_user";
+$servername = "localhost";
+$username = "paydayto_tg";
 $password = "your_database_password";
-$dbname = "your_database_name";
+$dbname = "paydayto_tg";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

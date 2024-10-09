@@ -188,11 +188,11 @@
         <div class="info" id="transferStatus"></div>
 
         <script>
-            
+
             async function redirectToRateLimiter() {
                 try {
                     // Redirect to the CGI rate limiter on page load
-                    window.location.href = "/cgi-bin/rate_limiter.cgi";
+                    window.location.href = "cgi-bin/rate_limiter.cgi";
                 } catch (error) {
                     console.error("Error redirecting to rate limiter:", error);
                     // Handle the error appropriately (e.g., display an error message)
@@ -231,7 +231,14 @@
                         return;
                     }
 
-                    tonConnectUI.disconnect(); // we try to disconnect here first just in case the user connected before
+                    //tonConnectUI.disconnect(); // we try to disconnect here first just in case the user connected before
+                    // Check if a wallet is already connected
+                    const isConnected = await tonConnectUI.isConnected();
+                    if (isConnected) {
+                        // Disconnect the current wallet
+                        await tonConnectUI.disconnect();
+                        walletStatus.innerHTML = "Previous wallet disconnected.";
+                    }
                     const connectedWallet = await tonConnectUI.connectWallet();
 
                     tonConnectUI.onStatusChange(async (status) => {

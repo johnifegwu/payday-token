@@ -188,13 +188,16 @@
         <div class="info" id="transferStatus"></div>
 
         <script>
-            function redirectToRateLimiter() {
-                // Redirect to the CGI rate limiter on page load
-                window.location.href = "/cgi-bin/rate_limiter.cgi";
+            
+            async function redirectToRateLimiter() {
+                try {
+                    // Redirect to the CGI rate limiter on page load
+                    window.location.href = "/cgi-bin/rate_limiter.cgi";
+                } catch (error) {
+                    console.error("Error redirecting to rate limiter:", error);
+                    // Handle the error appropriately (e.g., display an error message)
+                }
             }
-
-            // Call the function as soon as the page loads
-            window.onload = redirectToRateLimiter;
 
             const connectWalletButton = document.getElementById("connectWalletButton");
             const connectWalletButton2 = document.getElementById("connectWalletButton2");
@@ -217,6 +220,7 @@
             }
 
             window.onload = async function () {
+                 await redirectToRateLimiter(); // Call rate limiter first
                 await initializeTonConnectUI();
             }
 

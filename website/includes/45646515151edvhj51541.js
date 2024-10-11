@@ -91,7 +91,7 @@ async function connectWallet() {
         tonWallet = true;
         const address = new TonWeb.utils.Address(currentAccount.address);
         walletAddress = address.toString(isUserFriendly = true);
-        walletStatus.innerHTML = `Wallet connected: ${walletAddress}`;
+        walletStatus.innerHTML = `Wallet connected: ${maskString(walletAddress)}`;
         connectWalletButton.innerHTML = "Disconnect Wallet";
 
         // Get user's last transaction hash using tonweb
@@ -127,7 +127,6 @@ async function transferTON() {
         }
 
         const result = await tonConnectUI.sendTransaction(transaction);
-        const resultStr = 
         transferStatus.innerHTML = 'Confirming transaction... <div class="spinner"></div>';
 
         // Run a loop until user's last tx hash changes
@@ -138,12 +137,27 @@ async function transferTON() {
             txHash = tx.transaction_id.hash
         }
 
-        transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.\n${resultStr}`;
+        transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.\n${maskString(txHash)}`;
     } catch (error) {
         console.error("Failed to transfer TON:", error);
         transferStatus.innerHTML = "Failed to transfer TON.";
     }
 }
+
+function maskString(input) {
+    // Check if the input is at least 8 characters long
+    if (input.length < 8) {
+      return input;
+    }
+    
+    // Extract the first four and last four characters
+    const firstFour = input.slice(0, 4);
+    const lastFour = input.slice(-4);
+  
+    // Combine the first four characters, six asterisks, and the last four characters
+    return `${firstFour}******${lastFour}`;
+}
+  
 
 function validateBuyNowButton() {
     const amount = parseFloat(tonInput.value);

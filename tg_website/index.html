@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://tg.pday.online/imgs/paydayicon.png" type="image/png">
+    <title>PayDay Token Web App - Coming Soon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #d4af37;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background-color: #262626;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #d4af37;
+        }
+
+        button {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        button:hover {
+            background-color: #ffd700;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+            max-width: 40%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .links {
+            margin-top: 35px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .links a {
+            color: #ffcc00;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+
+            button {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="imgs/payday.png" alt="PayDay Token Logo" width="100%" height="100%">
+        </div>
+        <h1>PayDay Token Web App</h1>
+        <p>Coming Soon! Be among the first to join and earn <strong>1,000,000 $PDAY</strong> tokens.</p>
+        <button id="joinTelegramButton">Join Telegram</button>
+        <footer>
+            &copy; 2024 PayDay Token. All rights reserved.
+        </footer>
+    </div>
+    <script>
+        // Add click event listener to the Join Telegram button
+        document.getElementById('joinTelegramButton').addEventListener('click', function () {
+            window.location.href = 'https://t.me/tokenpayday';
+        });
+    </script>
+</body>
+
+</html>

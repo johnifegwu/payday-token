@@ -1,12 +1,13 @@
 <?php
-
+// check_tasks.php
 session_start();
 
-// Database Connection
-$servername = "localhost";
-$username = "paydayto_tg";
-$password = "your_database_password";
-$dbname = "paydayto_tg";
+$config = include('config.php');
+// Get environment variables for MySQL configuration
+$dbServer = $config['db_server'];
+$dbUser = $config['db_user'];
+$dbPassword = $config['db_password'];
+$dbName = $config['db_name'];
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -21,49 +22,95 @@ if (isset($_SESSION['telegram_id'])) {
   // Rate limiting (adjust $rateLimitSeconds as needed)
   $rateLimitSeconds = 5; // Allow API calls every 5 seconds
 
-  $sql = "SELECT last_api_call FROM users WHERE telegram_id = '$telegramId'";
-  $result = $conn->query($sql);
+  // Use prepared statement to prevent SQL injection
+  $stmt = $conn->prepare("SELECT last_api_call FROM users WHERE telegram_id = ?");
+  if ($stmt === false) {
+      die("SQL prepare failed: " . $conn->error);
+  }
+  $stmt->bind_param("s", $telegramId);
+  
+  if (!$stmt->execute()) {
+      die("SQL execution failed: " . $stmt->error);
+  }
+
+  $result = $stmt->get_result();
   if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $lastAPICall = $row['last_api_call'];
 
     if ($lastAPICall === null || time() - strtotime($lastAPICall) >= $rateLimitSeconds) {
-      // LinkedIn verification (replace with actual API calls)
-      $linkedin_followed = checkLinkedInFollow($telegramId, "YOUR_LINKEDIN_PAGE_ID", "YOUR_LINKEDIN_API_KEY"); 
+      // LinkedIn verification
+      $linkedin_followed = checkLinkedInFollow($telegramId, "payday-token", "LINKEDIN_API_KEY");
       if ($linkedin_followed) {
-        $sql = "UPDATE users SET linkedin_followed = TRUE WHERE telegram_id = '$telegramId'";
-        $conn->query($sql);
+        $stmt = $conn->prepare("UPDATE users SET linkedin_followed = TRUE WHERE telegram_id = ?");
+        if ($stmt === false) {
+            die("SQL prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("s", $telegramId);
+        if (!$stmt->execute()) {
+            die("SQL execution failed: " . $stmt->error);
+        }
       }
 
-      $linkedin_liked = checkLinkedInLike($telegramId, "YOUR_LINKEDIN_POST_ID", "YOUR_LINKEDIN_API_KEY");
+      $linkedin_liked = checkLinkedInLike($telegramId, "7250768314702979072-HXD9", "LINKEDIN_API_KEY");
       if ($linkedin_liked) {
-        $sql = "UPDATE users SET linkedin_liked = TRUE WHERE telegram_id = '$telegramId'";
-        $conn->query($sql);
+        $stmt = $conn->prepare("UPDATE users SET linkedin_liked = TRUE WHERE telegram_id = ?");
+        if ($stmt === false) {
+            die("SQL prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("s", $telegramId);
+        if (!$stmt->execute()) {
+            die("SQL execution failed: " . $stmt->error);
+        }
       }
 
       // Twitter verification (replace with actual API calls)
-      $twitter_followed = checkTwitterFollow($telegramId, "YOUR_TWITTER_ACCOUNT_ID", "YOUR_TWITTER_API_KEY");
+      $twitter_followed = checkTwitterFollow($telegramId, "token_payday", "TWITTER_API_KEY");
       if ($twitter_followed) {
-        $sql = "UPDATE users SET twitter_followed = TRUE WHERE telegram_id = '$telegramId'";
-        $conn->query($sql);
+        $stmt = $conn->prepare("UPDATE users SET twitter_followed = TRUE WHERE telegram_id = ?");
+        if ($stmt === false) {
+            die("SQL prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("s", $telegramId);
+        if (!$stmt->execute()) {
+            die("SQL execution failed: " . $stmt->error);
+        }
       }
 
-      $twitter_retweeted = checkTwitterRetweet($telegramId, "YOUR_TWITTER_POST_ID", "YOUR_TWITTER_API_KEY"); 
+      $twitter_retweeted = checkTwitterRetweet($telegramId, "1844054521590534308", "TWITTER_API_KEY");
       if ($twitter_retweeted) {
-        $sql = "UPDATE users SET twitter_retweeted = TRUE WHERE telegram_id = '$telegramId'";
-        $conn->query($sql);
+        $stmt = $conn->prepare("UPDATE users SET twitter_retweeted = TRUE WHERE telegram_id = ?");
+        if ($stmt === false) {
+            die("SQL prepare failed: " . $conn->error);
+        }
+        $stmt->bind_param("s", $telegramId);
+        if (!$stmt->execute()) {
+            die("SQL execution failed: " . $stmt->error);
+        }
       }
 
       // Update last_api_call timestamp
-      $sql = "UPDATE users SET last_api_call = NOW() WHERE telegram_id = '$telegramId'";
-      $conn->query($sql);
-    } 
+      $stmt = $conn->prepare("UPDATE users SET last_api_call = NOW() WHERE telegram_id = ?");
+      if ($stmt === false) {
+          die("SQL prepare failed: " . $conn->error);
+      }
+      $stmt->bind_param("s", $telegramId);
+      if (!$stmt->execute()) {
+          die("SQL execution failed: " . $stmt->error);
+      }
+    }
 
     // Fetch task completion status from database
-    $sql = "SELECT linkedin_followed, linkedin_liked, twitter_followed, twitter_retweeted 
-            FROM users WHERE telegram_id = '$telegramId'";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare("SELECT linkedin_followed, linkedin_liked, twitter_followed, twitter_retweeted FROM users WHERE telegram_id = ?");
+    if ($stmt === false) {
+        die("SQL prepare failed: " . $conn->error);
+    }
+    $stmt->bind_param("s", $telegramId);
+    if (!$stmt->execute()) {
+        die("SQL execution failed: " . $stmt->error);
+    }
 
+    $result = $stmt->get_result();
     if ($result->num_rows > 0) {
       $row = $result->fetch_assoc();
       echo json_encode($row);
@@ -71,7 +118,7 @@ if (isset($_SESSION['telegram_id'])) {
       echo json_encode(['error' => 'User not found']);
     }
   } else {
-    echo json_encode(['error' => 'User not found']); // This was also incomplete
+    echo json_encode(['error' => 'User not found']);
   }
 } else {
   echo json_encode(['error' => 'User not logged in']);

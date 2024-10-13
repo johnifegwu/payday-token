@@ -175,7 +175,8 @@
             }
         }
     </style>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" defer></script> 
+    <link rel="stylesheet" href="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.css" />
     <!-- <script src="https://pday.online/node_modules/@tonconnect/ui/dist/tonconnect-ui.min.js" defer></script> -->
     <!-- <script src="https://pday.online/node_modules/@tonconnect/sdk/dist/tonconnect-sdk.min.js" defer></script> -->
 </head>
@@ -187,12 +188,12 @@
             <img src="imgs/payday.png" alt="PayDay Token Logo" width="100%" height="100%">
         </div>
         <h1>PayDay Token Presale</h1>
-        <p>Presale Price: <strong>$0.0001 per PDAY</strong></p>
-        <p>Expected Listing Price: <strong>$0.0006 per PDAY</strong></p>
+        <p>Presale Price: <strong>$0.0006 per PDAY</strong></p>
+        <p>Expected Listing Price: <strong>$0.001 per PDAY</strong></p>
         <p>Minimum TON Required: <strong>0.7 TON</strong></p>
 
         <div class="input-container">
-            <input type="number" id="tonInput" min="0.7" max="2000" placeholder="Enter TON amount" />
+            <input type="number" id="tonInput" min="0.7" max="5000" placeholder="Enter TON amount" />
         </div>
 
         <button id="buyNowButton" disabled>Buy Now</button>

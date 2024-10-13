@@ -1,54 +1,120 @@
 <?php
+$config = include('config.php');
+// Get environment variables for MySQL configuration
+$dbServer = $config['db_server'];
+$dbUser = $config['db_user'];
+$dbPassword = $config['db_password'];
+$dbName = $config['db_name'];
+
 
 // Rate Limiting Configuration
 $LIMIT = 5; // Max requests allowed
-$IP = $_SERVER['REMOTE_ADDR']; // Client's IP address
 $TIME_FRAME = 60; // Time frame in seconds
-$DB_FILE = "var/db/rate_limit.db"; // SQLite database file
 
-// Create or open the SQLite database
-$db = new SQLite3($DB_FILE);
+// Get client's IP address
+$IP = $_SERVER['REMOTE_ADDR'];
 
-// Create the table if it doesn't exist using a prepared statement
-$db->exec("CREATE TABLE IF NOT EXISTS requests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ip TEXT,
-    timestamp INTEGER
-)");
+// Establish database connection and handle potential errors
+try {
+    // Create the DSN (Data Source Name) string
+    $dsn = "mysql:host=$dbServer;dbname=$dbName;charset=utf8mb4";
+    $db = new PDO($dsn, $dbUser, $dbPassword);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Get the current timestamp
-$NOW = time();
+    // Ensure the requests table exists
+    createRequestsTable($db);
 
-// Clean up old entries that are outside of the time frame
-$stmt_cleanup = $db->prepare("DELETE FROM requests WHERE timestamp < ?");
-$stmt_cleanup->bindValue(1, $NOW - $TIME_FRAME, SQLITE3_INTEGER);
-$stmt_cleanup->execute();
+    // Current timestamp
+    $NOW = time();
 
-// Use a parameterized query to count requests from the IP in the defined time frame
-$stmt_count = $db->prepare("SELECT COUNT(*) FROM requests WHERE ip = ? AND timestamp >= ?");
-$stmt_count->bindValue(1, $IP, SQLITE3_TEXT);
-$stmt_count->bindValue(2, $NOW - $TIME_FRAME, SQLITE3_INTEGER);
-$result = $stmt_count->execute();
-$COUNT = $result->fetchArray(SQLITE3_NUM)[0];
+    // Clean up old entries and count current requests
+    cleanUpOldRequests($db, $NOW - $TIME_FRAME);
+    $COUNT = countRequests($db, $IP, $NOW - $TIME_FRAME);
 
-// Check if the request count exceeds the limit
-if ($COUNT >= $LIMIT) {
+    // Check request limit
+    if ($COUNT >= $LIMIT) {
+        sendRateLimitExceededResponse();
+    }
+
+    // Log the request
+    logRequest($db, $IP, $NOW);
+
+    // Serve the presale page
+    servePresalePage();
+
+} catch (PDOException $e) {
+    echo "Connection failed: dbname=$dbname " . $e->getMessage();
+}
+
+/**
+ * Create the requests table if it doesn't exist.
+ *
+ * @param PDO $db
+ */
+function createRequestsTable(PDO $db) {
+    $db->exec("CREATE TABLE IF NOT EXISTS requests (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        ip VARCHAR(45) NOT NULL,
+        timestamp INT NOT NULL
+    )");
+}
+
+/**
+ * Clean up old request entries from the database.
+ *
+ * @param PDO $db
+ * @param int $timestamp
+ */
+function cleanUpOldRequests(PDO $db, int $timestamp) {
+    $stmt_cleanup = $db->prepare("DELETE FROM requests WHERE timestamp < :timestamp");
+    $stmt_cleanup->bindValue(':timestamp', $timestamp, PDO::PARAM_INT);
+    $stmt_cleanup->execute();
+}
+
+/**
+ * Count the number of requests from a specific IP within the time frame.
+ *
+ * @param PDO $db
+ * @param string $ip
+ * @param int $timestamp
+ * @return int
+ */
+function countRequests(PDO $db, string $ip, int $timestamp): int {
+    $stmt_count = $db->prepare("SELECT COUNT(*) FROM requests WHERE ip = :ip AND timestamp >= :timestamp");
+    $stmt_count->bindValue(':ip', $ip, PDO::PARAM_STR);
+    $stmt_count->bindValue(':timestamp', $timestamp, PDO::PARAM_INT);
+    $stmt_count->execute();
+    return (int)$stmt_count->fetchColumn();
+}
+
+/**
+ * Log a request in the database.
+ *
+ * @param PDO $db
+ * @param string $ip
+ * @param int $timestamp
+ */
+function logRequest(PDO $db, string $ip, int $timestamp) {
+    $stmt_insert = $db->prepare("INSERT INTO requests (ip, timestamp) VALUES (:ip, :timestamp)");
+    $stmt_insert->bindValue(':ip', $ip, PDO::PARAM_STR);
+    $stmt_insert->bindValue(':timestamp', $timestamp, PDO::PARAM_INT);
+    $stmt_insert->execute();
+}
+
+/**
+ * Send a response indicating that the rate limit has been exceeded.
+ */
+function sendRateLimitExceededResponse() {
     header('Content-type: text/html');
     echo "<html><body><h1>Rate limit exceeded. Try again later.</h1></body></html>";
     exit;
 }
 
-// Log the request with the current timestamp using a prepared statement
-$stmt_insert = $db->prepare("INSERT INTO requests (ip, timestamp) VALUES (?, ?)");
-$stmt_insert->bindValue(1, $IP, SQLITE3_TEXT);
-$stmt_insert->bindValue(2, $NOW, SQLITE3_INTEGER);
-$stmt_insert->execute();
-
-// Allow access to the presale page
-header('Content-type: text/html');
-readfile("presale.html");
-
-// Close the database connection
-$db->close();
-
+/**
+ * Serve the presale page.
+ */
+function servePresalePage() {
+    header('Content-type: text/html');
+    readfile("presale.html");
+}
 ?>

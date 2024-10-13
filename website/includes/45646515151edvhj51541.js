@@ -161,7 +161,7 @@ function maskString(input) {
 
 function validateBuyNowButton() {
     const amount = parseFloat(tonInput.value);
-    buyNowButton.disabled = !(tonWallet && amount >= 0.7 && amount <= 2000);
+    buyNowButton.disabled = !(tonWallet && amount >= 0.7 && amount <= 5000);
 }
 
 connectWalletButton.addEventListener('click', connectWallet);

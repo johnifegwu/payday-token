@@ -2,10 +2,9 @@
 const tonweb = new window.TonWeb();
 
 const tonconnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: 'https://tg.pday.online/tonconnect-manifest.json'
+    manifestUrl: 'https://tg.pday.online/tonconnect-manifest.json',
+    buttonRootId: 'tonconnect-button'
 });
-
-tonconnectUI.render('#tonconnect-button');
 
 tonconnectUI.on('connect', async (wallet) => {
     const mechineaddress = new TonWeb.utils.Address(wallet.account.address);

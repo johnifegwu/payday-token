@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayDay Token</title>
+    <link rel="icon" href="https://tg.pday.online/imgs/paydayicon.png" type="image/png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #d4af37;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #262626;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .links {
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: #ffcc00;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #d4af37;
+            font-size: 1em;
+        }
+
+        button {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 200px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #ffd700;
+        }
+
+        button:disabled {
+            background-color: #333;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+
+        .info {
+            margin: 15px 0;
+        }
+
+        .logo {
+            margin-bottom: 15px;
+            max-width: 60%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .links a {
+            color: #ffcc00;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            font-size: 12px;
+            color: #d4af37;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Mobile-specific styling */
+        @media (max-width: 600px) {
+            body {
+                overflow-y: scroll;
+            }
+
+            .container {
+                height: 100vh;
+                box-sizing: border-box;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            button {
+                font-size: 0.9em;
+            }
+
+            .links {
+                font-size: 10px;
+            }
+
+            footer {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <img src="imgs/payday.png" alt="PayDay Token Logo" class="logo">
+
+    <div class="container">
+        <h1>PayDay Token Distribution!</h1>
+        <div id="telegram-id" style="text-align: left; color: #ffcc00; margin-bottom: 10px;">
+            TG ID: <span id="telegramIdDisplay"></span>
+        </div>
+        <p style="font-size: 18px; color: #ffcc00; font-weight: 600;">
+            $: <span id="token-count">0</span>
+        </p>
+
+        <button id="linkedInFollowBtn">Follow on LinkedIn 200,000 $PDAY</button>
+        <button id="linkedInLikeBtn" disabled>Like and Repost our LinkedIn Post 200,000 $PDAY</button>
+        <button id="twitterFoollowBtn" disabled>Follow us on Twitter 200,000 $PDAY</button>
+        <button id="twitterRetweetBtn" disabled>Like and Retweet our Twitter Post 200,000 $PDAY</button>
+        <button id="connectWalletBtn" disabled>Connect TON Wallet 200,000 tokens</button>
+
+        <div class="info" id="taskStatus"></div>
+    </div>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="includes/545387treyt75545.js"></script>
+    <script>
+        const telegramId = "<?php echo $_SESSION['telegram_id']; ?>";
+        document.getElementById('telegramIdDisplay').innerText = telegramId;
+    </script>
+
+    <footer>
+        &copy; 2024 PayDay Token. All Rights Reserved.
+    </footer>
+
+</body>
+
+</html>

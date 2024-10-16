@@ -92,7 +92,7 @@ function retweetTwitterPost() {
 
 function connectWallet(){
     // Navigate the user to a new page
-    window.open("connectwallet.php", "_blank");
+    window.open("connect_wallet.php", "_blank");
 }
 
 linkedInFollowButton.addEventListener("click", function () {

@@ -151,7 +151,7 @@ try {
     // Check if the user exists in the database
     $stmt = $db->prepare("SELECT * FROM users WHERE telegram_id = ?");
     $stmt->bindParam(1, $UserID, PDO::PARAM_STR);
-    
+
     // Execute the query
     if ($stmt->execute()) {
         if ($stmt->rowCount() > 0) {
@@ -257,6 +257,10 @@ function logRequest(PDO $db, string $ip, int $timestamp)
     $stmt_insert->execute();
 }
 
+function getTotalEarned(PDO $db, $telegramId){
+    $stmt_select = $db->prepare("SELECT tokens FROM users  WHERE telegram_id = ?");
+}
+
 /**
  * Send a response indicating that the rate limit has been exceeded.
  */
@@ -293,40 +297,43 @@ function invalidRequestPage($Where)
  */
 function createUsersTable(PDO $db)
 {
-    $db->exec("CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        telegram_id VARCHAR(255) UNIQUE,
-        ton_wallet VARCHAR(255) UNIQUE,
-        tokens INT DEFAULT 0,
-        linkedin_followed BOOLEAN DEFAULT FALSE,
-        linkedin_liked BOOLEAN DEFAULT FALSE,
-        twitter_followed BOOLEAN DEFAULT FALSE,
-        twitter_retweeted BOOLEAN DEFAULT FALSE,
-        wallet_connected BOOLEAN DEFAULT FALSE,
-        last_api_call TIMESTAMP NULL DEFAULT NULL
-    )");
+    // we return here to improve oerformance as the tables are already created
 
-    // Check if the columns already exist
-    try {
-        $stmt = $db->query("SHOW COLUMNS FROM users LIKE 'first_name'");
-        $firstNameExists = $stmt->fetchColumn() !== false;
+    // $db->exec("CREATE TABLE IF NOT EXISTS users (
+    //     id INT AUTO_INCREMENT PRIMARY KEY,
+    //     telegram_id VARCHAR(255) UNIQUE,
+    //     ton_wallet VARCHAR(255) UNIQUE,
+    //     tokens INT DEFAULT 0,
+    //     linkedin_followed BOOLEAN DEFAULT FALSE,
+    //     linkedin_liked BOOLEAN DEFAULT FALSE,
+    //     twitter_followed BOOLEAN DEFAULT FALSE,
+    //     twitter_retweeted BOOLEAN DEFAULT FALSE,
+    //     wallet_connected BOOLEAN DEFAULT FALSE,
+    //     last_api_call TIMESTAMP NULL DEFAULT NULL
+    // )");
 
-        if (!$firstNameExists) {
-            // Add the new columns
-            $db->exec("ALTER TABLE users 
-                        ADD COLUMN first_name VARCHAR(255),
-                        ADD COLUMN last_name VARCHAR(255),
-                        ADD COLUMN user_name VARCHAR(255),
-                        ADD COLUMN lang VARCHAR(10)");
-        }
-    } catch (PDOException $e) {
-        // Handle any potential errors
-        echo "Error checking or altering table: " . $e->getMessage();
-    }
+    // // Check if the columns already exist
+    // try {
+    //     $stmt = $db->query("SHOW COLUMNS FROM users LIKE 'first_name'");
+    //     $firstNameExists = $stmt->fetchColumn() !== false;
+
+    //     if (!$firstNameExists) {
+    //         // Add the new columns
+    //         $db->exec("ALTER TABLE users 
+    //                     ADD COLUMN first_name VARCHAR(255),
+    //                     ADD COLUMN last_name VARCHAR(255),
+    //                     ADD COLUMN user_name VARCHAR(255),
+    //                     ADD COLUMN lang VARCHAR(10)");
+    //     }
+    // } catch (PDOException $e) {
+    //     // Handle any potential errors
+    //     echo "Error checking or altering table: " . $e->getMessage();
+    // }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -499,7 +506,6 @@ function createUsersTable(PDO $db)
         const telegramId = "<?php echo $_SESSION['telegram_id']; ?>";
         document.getElementById('telegramIdDisplay').innerText = telegramId;
     </script>
-
     <footer>
         &copy; 2024 PayDay Token. All Rights Reserved.
     </footer>

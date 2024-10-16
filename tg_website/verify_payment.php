@@ -108,28 +108,33 @@ function updateUserWalletStatus($conn, $address) {
 
 // Main Logic
 try {
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $address = $_POST["address"] ?? '';
-
-        if (empty($address)) {
-            throw new Exception("Address not provided");
-        }
-
-        $conn = getDatabaseConnection($SERVERNAME, $USERNAME, $PASSWORD, $DBNAME);
-
-        if (isPaymentLimitReached($conn, $PAYMENT_LIMIT)) {
-            echo "disabled";
-        } else {
-
-            if (hasValidTransaction($address, $REQUIRED_AMOUNT,  $PAYDAY_TOKEN_WALLET, $TON_API_KEY)) {
-                updateUserWalletStatus($conn, $address);
-                echo "success";
-            } else {
-                echo "failed";
+    if (isset($_SESSION['telegram_id'])) {
+        $telegramId = $_SESSION['telegram_id'];
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $address = $_POST["address"] ?? '';
+    
+            if (empty($address)) {
+                throw new Exception("Address not provided");
             }
+    
+            $conn = getDatabaseConnection($SERVERNAME, $USERNAME, $PASSWORD, $DBNAME);
+    
+            if (isPaymentLimitReached($conn, $PAYMENT_LIMIT)) {
+                echo "disabled";
+            } else {
+    
+                if (hasValidTransaction($address, $REQUIRED_AMOUNT,  $PAYDAY_TOKEN_WALLET, $TON_API_KEY)) {
+                    updateUserWalletStatus($conn, $address);
+                    echo "success";
+                } else {
+                    echo "failed";
+                }
+            }
+    
+            $conn->close();
         }
-
-        $conn->close();
+    } else {
+        echo json_encode(['error' => 'User not logged in']);    
     }
 } catch (Exception $e) {
     echo "error: " . $e->getMessage();

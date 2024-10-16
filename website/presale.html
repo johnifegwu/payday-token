@@ -132,6 +132,52 @@
             display: inline-block;
             margin-left: 10px;
         }
+        
+        .exchanges-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #262626;
+            border-radius: 10px;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+
+        .exchanges-section h2 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+
+        .exchange-list {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .exchange-item {
+            margin: 10px;
+            text-align: center;
+        }
+
+        .exchange-item a {
+            color: #d4af37;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .exchange-item a:hover {
+            text-decoration: underline;
+        }
+
+        .exchange-logo {
+            max-width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
 
         @keyframes spin {
             0% {
@@ -204,7 +250,18 @@
 
         <script src="dist/tonweb.js"></script>
         <script src="includes/45646515151edvhj51541.js"></script>
-
+        <div class="exchanges-section">
+            <h2>Available on Exchanges</h2>
+            <div class="exchange-list">
+                <div class="exchange-item">
+                    <a href="https://blockspot.io/coin/payday-2/" target="_blank">
+                        <img src="imgs/blockspot.png" alt="Blockspot" class="exchange-logo">
+                        <span></span>
+                    </a>
+                </div>
+                <!-- Add more exchanges similarly -->
+            </div>
+        </div>
         <div class="links">
             <a href="https://pday.online/whitepaper.pdf" target="_blank">Whitepaper</a> |
             <a href="https://x.com/token_payday?t=c9pgwx_ikva8vBwWTNm8EA&s=09" target="_blank">Twitter</a> |

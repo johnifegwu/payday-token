@@ -63,11 +63,11 @@ try {
  */
 function createRequestsTable(PDO $db)
 {
-    $db->exec("CREATE TABLE IF NOT EXISTS requests (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        ip VARCHAR(45) NOT NULL,
-        timestamp INT NOT NULL
-    )");
+    // $db->exec("CREATE TABLE IF NOT EXISTS requests (
+    //     id INT AUTO_INCREMENT PRIMARY KEY,
+    //     ip VARCHAR(45) NOT NULL,
+    //     timestamp INT NOT NULL
+    // )");
 }
 
 /**

@@ -12,13 +12,19 @@ const tqitterProfileUrl = "https://x.com/token_payday";
 const twitterPostUrl = "https://x.com/token_payday/status/1843531784899981646";
 
 
-function checkTaskCompletion(taskName, currentButton, nextButton, currentTaskStatus, url) {
+function checkTaskCompletion(taskName, currentButton, nextButton, taskStatus, url) {
     // Ensure taskStatus is a jQuery object
-    var $currentTaskStatus = $(currentTaskStatus); // Convert the div element to a jQuery object
+    var $taskStatus = $(taskStatus); // Convert the div element to a jQuery object
 
     // Display countdown next to the task
     var countdown = 14;
-    var countdownDisplay = $('<span> (' + countdown + ')</span>').appendTo($currentTaskStatus);
+
+    if(taskName == "wallet_connected"){
+        // set countdown to 300 seconds
+        countdown = 300;
+    }
+
+    var countdownDisplay = $('<span> (' + countdown + ')</span>').appendTo($taskStatus);
 
     var countdownInterval = setInterval(function () {
         countdown--;
@@ -27,10 +33,10 @@ function checkTaskCompletion(taskName, currentButton, nextButton, currentTaskSta
         if (countdown <= 0) {
             clearInterval(countdownInterval);
             countdownDisplay.remove(); // Remove countdown after it finishes
-
+            countdownDisplay = $('Checking... <div class="spinner"></div>').appendTo($currentTaskStatus);
             // Check task completion after countdown
             $.ajax({
-                url: url, // Use dynamic URL passed to the function
+                url: 'check_tasks.php', // Use dynamic URL passed to the function
                 type: 'GET',
                 success: function (response) {
                     try {
@@ -40,14 +46,19 @@ function checkTaskCompletion(taskName, currentButton, nextButton, currentTaskSta
                         let tokens = parseInt($('#token-count').text(), 10); // Ensure the token count is an integer
                         if (tasks[taskName]) {
                             tokens += 200000; // Add tokens if the task is completed
-                        }
-                        $('#token-count').text(tokens);
+                            $('#token-count').text(tokens);
 
-                        // Update task completion display
-                        nextButton.disabled = false;
-                        currentButton.disabled = true;
+                            // Update task completion display
+                            if(nextButton){
+                                nextButton.disabled = false;
+                            }
+                            currentButton.disabled = true;
+                        }
                     } catch (e) {
                         console.error("Failed to parse response: ", e);
+                    }
+                    finally{
+                        countdownDisplay.remove(); // Remove countdown after it finishes
                     }
                 },
                 error: function (xhr, status, error) {
@@ -93,6 +104,7 @@ function retweetTwitterPost() {
 function connectWallet(){
     // Navigate the user to a new page
     window.open("connect_wallet.php", "_blank");
+    checkTaskCompletion("wallet_connected", connectWalletButton, null, taskStatus, null);
 }
 
 linkedInFollowButton.addEventListener("click", function () {

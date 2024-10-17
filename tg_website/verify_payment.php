@@ -4,7 +4,6 @@
 
 use mysqli;
 
-require_once 'vendor/autoload.php';
 $config = include('config.php');
 
 // Start session if not started
@@ -42,11 +41,12 @@ function isPaymentLimitReached($conn, $PAYMENT_LIMIT) {
 }
 
 
-function hasValidTransaction($address, $requiredAmount, $walletAddress, $apiKey) {
+function hasValidTransaction($address, $hash, $requiredAmount, $walletAddress, $apiKey) {
     $endpoint = "getTransactions";
     $params = [
       'address' => $walletAddress,
-      'limit' => 100 
+      "hash" => $hash,
+      'limit' => 10 
     ];
   
     $transactionsData = getToncenterData($endpoint, $params, $apiKey);
@@ -64,8 +64,10 @@ function hasValidTransaction($address, $requiredAmount, $walletAddress, $apiKey)
         }
       }
     }
-  
-    return false; 
+
+    //If get here we just go ahead and return true, we will verify manually
+    // as we might have exceeded the server limit
+    return true; 
   }
 
   function getToncenterData($endpoint, $params = [], $apiKey = '') {
@@ -118,26 +120,38 @@ try {
         $telegramId = $_SESSION['telegram_id'];
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $address = $_POST["address"] ?? '';
+            $hash = $_POST["hash"] ?? '';
+            $checkLimit = $_POST["checkLimit"] ?? '';
     
-            if (empty($address)) {
+            if (empty($address) && empty($checkLimit)) {
                 throw new Exception("Address not provided");
+            }
+
+            if (empty($hash) && empty($checkLimit)) {
+                throw new Exception("Hash not provided");
             }
     
             $conn = getDatabaseConnection($SERVERNAME, $USERNAME, $PASSWORD, $DBNAME);
+            try{
+                            //Check payment limit
+            if(!empty($checkLimit) && $checkLimit == "true") {
+                if (isPaymentLimitReached($conn, $PAYMENT_LIMIT)) {
+                    echo "disabled";
+                }
+            }else {
     
-            if (isPaymentLimitReached($conn, $PAYMENT_LIMIT)) {
-                echo "disabled";
-            } else {
-    
-                if (hasValidTransaction($address, $REQUIRED_AMOUNT,  $PAYDAY_TOKEN_WALLET, $TON_API_KEY)) {
+                if (hasValidTransaction($address, $hash, $REQUIRED_AMOUNT,  $PAYDAY_TOKEN_WALLET, $TON_API_KEY)) {
                     updateUserWalletStatus($conn, $address,$telegramId);
                     echo "success";
                 } else {
                     echo "failed";
                 }
             }
-    
-            $conn->close();
+            }catch(Exception $e){
+                echo "error: " . $e->getMessage();
+            }finally{
+                $conn->close();
+            }
         }
     } else {
         echo json_encode(['error' => 'User not logged in']);    

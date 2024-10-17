@@ -110,13 +110,40 @@
             <img src="imgs/payday.png" alt="PayDay Token Logo" width="100%" height="100%">
         </div>
         <h1>PayDay Token Web App</h1>
-        <p>Coming Soon! Be among the first to join and earn <strong>1,000,000 $PDAY</strong> tokens.</p>
+        <p>Launching in less than <span id="countdown">24</span> hours!</p>
+        <p>Be among the first to join and earn <strong>1,000,000 $PDAY</strong> tokens.</p>
         <button id="joinTelegramButton">Join Telegram</button>
         <footer>
             &copy; 2024 PayDay Token. All rights reserved.
         </footer>
     </div>
     <script>
+        // Set the launch time to 17th October 2024, 08:00 UTC
+        let launchTime = new Date(Date.UTC(2024, 9, 18, 8, 0, 0)).getTime(); // Note: Month is 0-indexed, so 9 = October
+
+        // Update the countdown every second
+        let countdownInterval = setInterval(function () {
+            // Get the current time
+            let now = new Date().getTime();
+
+            // Calculate the time difference
+            let timeLeft = launchTime - now;
+
+            // Time calculations for hours, minutes, and seconds
+            let hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
+            let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            // Display the result in the countdown span
+            document.getElementById("countdown").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
+
+            // If the countdown is finished, stop the timer and display "Launched"
+            if (timeLeft < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById("countdown").innerHTML = "Launched!";
+            }
+        }, 1000);
+
         // Add click event listener to the Join Telegram button
         document.getElementById('joinTelegramButton').addEventListener('click', function () {
             window.location.href = 'https://t.me/tokenpayday';

@@ -7,6 +7,7 @@ $config = include('config.php');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 // Get environment variables for MySQL configuration
 $dbServer = $config['db_server'];
 $dbUser = $config['db_user'];
@@ -15,65 +16,66 @@ $dbName = $config['db_name'];
 
 if (isset($_SESSION['telegram_id'])) {
     $telegramId = $_SESSION['telegram_id'];
+
     // Create a database connection using MySQLi with error handling
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    $conn = new mysqli($dbServer, $dbUser, $dbPassword, $dbName);
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        http_response_code(500);
+        echo json_encode(['error' => 'Database connection failed: ' . $conn->connect_error]);
+        exit();
     }
+
     try {
         // Process only POST requests
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Validate and sanitize user input
             if (isset($_POST["address"]) && !empty($_POST["address"]) && isset($_POST["amount"]) && !empty($_POST["amount"])) {
                 $address = $conn->real_escape_string($_POST["address"]);
-                $amount = intval($$conn->real_escape_string($_POST["amount"]));
+                $amount = intval($conn->real_escape_string($_POST["amount"]));
 
                 // Check if the address exists first (optional)
                 $sql_check = "SELECT ton_wallet FROM users WHERE ton_wallet = ? AND telegram_id = ?";
                 $stmt_check = $conn->prepare($sql_check);
-                $stmt_check->bind_param("s", $address);
-                $stmt_check->bind_param("s", $telegramId);
+                $stmt_check->bind_param("ss", $address, $telegramId);
                 $stmt_check->execute();
                 $result = $stmt_check->get_result();
 
-                // If the address exists, update (if needed)
                 if ($result->num_rows > 0) {
-                    $stmt_check->close(); // Close the check statement
+                    // Close the check statement
+                    $stmt_check->close();
 
-                    //Update users table set tokens = $amount
+                    // Update tokens for an existing wallet address
                     $sql_update = "UPDATE users SET tokens = ? WHERE ton_wallet = ? AND telegram_id = ?";
                     $stmt_update = $conn->prepare($sql_update);
-                    $stmt_update->bind_param("i", $amount);
-                    $stmt_update->bind_param("s", $address);
-                    $stmt_check->bind_param("s", $telegramId);
+                    $stmt_update->bind_param("iss", $amount, $address, $telegramId);
                     $stmt_update->execute();
-                    // No tokens credited for payment task, just log or respond
-                    echo "Credited with $amount PDAY, address is valid.";
 
+                    echo json_encode(['message' => "Credited with $amount PDAY, address is valid."]);
                 } else {
-                    // Handle case where the wallet address does not exist
-                    //Update users table set tokens = $amount
+                    // Address does not exist, add it and credit tokens
                     $sql_update = "UPDATE users SET tokens = ?, ton_wallet = ? WHERE telegram_id = ?";
                     $stmt_update = $conn->prepare($sql_update);
-                    $stmt_update->bind_param("i", $amount);
-                    $stmt_update->bind_param("s", $address);
-                    $stmt_check->bind_param("s", $telegramId);
+                    $stmt_update->bind_param("iss", $amount, $address, $telegramId);
                     $stmt_update->execute();
-                    echo "Address added and $amount PDAY credited. ";
+
+                    echo json_encode(['message' => "Address added and $amount PDAY credited."]);
                 }
 
+                $stmt_update->close();
             } else {
-                echo "Invalid address. or amount";
+                echo json_encode(['error' => 'Invalid address or amount']);
             }
         } else {
-            echo "Invalid request method.";
+            echo json_encode(['error' => 'Invalid request method']);
         }
     } catch (Exception $e) {
+        http_response_code(500);
         echo json_encode(['error' => $e->getMessage()]);
     } finally {
         $conn->close();
     }
 } else {
+    http_response_code(403); // Forbidden response code for unauthorized access
     echo json_encode(['error' => 'User not logged in']);
 }
 

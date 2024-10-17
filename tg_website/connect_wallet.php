@@ -227,7 +227,25 @@ if (isset($_SESSION['telegram_id'])) {
         .error {
             border-color: #f44336;
         }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
 
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
         /* Mobile-specific adjustments */
         @media (max-width: 600px) {
             .bottom-tab {
@@ -254,6 +272,7 @@ if (isset($_SESSION['telegram_id'])) {
             }
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -271,149 +290,15 @@ if (isset($_SESSION['telegram_id'])) {
         <?php } else { ?>
             <button id="connectWalletButton">Connect Wallet & pay 0.2 TON gass fee.</button>
             <button id="payNowButton" disabled>Pay Now.</button>
-            <div class="info" style="font-style: italic; color: #b3b3b3;">
-                <p>Use Telegram Wallet if you're on a mobile device..</p>
-                <p>The rest of the Wallets works on Desktop.</p>
+            <div class="info" style="font-style: italic; color: #D3D3D3;">
+                <p>Use Telegram Wallet on a mobile devices.</p>
+                <p>The rest of the Wallets works fine on Desktop.</p>
             </div>
             <div id="message" class="message"></div>
         <?php } ?>
     </div>
     <script src="https://pday.online/dist/tonweb.js"></script>
-    <!-- <script src="includes/jghjg76578hkjkjkljkl.js"></script> -->
-    <script>
-        const tonweb = new window.TonWeb();
-        const connectWalletButton = document.getElementById("connectWalletButton");
-        const payNowButton = document.getElementById("payNowButton");
-        let address = null;
-
-        const currentIsConnectedStatus = tonconnectUI.connected;
-
-        if (currentIsConnectedStatus) {
-            await tonconnectUI.disconnect(); // disconnect any previously connected wallet
-        }
-        const wallet = await tonconnectUI.connectWallet();
-        const mechineaddress = new TonWeb.utils.Address(wallet.account.address);
-        const address = null;
-
-        const tonconnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://tg.pday.online/tonconnect-manifest.json',
-        });
-
-        async function connectWallet() {
-            connectWalletButton.disabled = true;
-            try {
-                if (!tonconnectUI) {
-                    showMessage('error', "TonConnectUI not initialized.");
-                    return;
-                }
-
-                const currentIsConnectedStatus = tonconnectUI.connected;
-
-                if (currentIsConnectedStatus) {
-                    await tonconnectUI.disconnect(); // disconnect any previously connected wallet
-                }
-
-                if (connectWalletButton.innerHTML == "Disconnect Wallet") {
-                    connectWalletButton.innerHTML = "Connect Wallet"
-                    return;
-                }
-
-                const wallet = await tonconnectUI.connectWallet();
-                const mechineaddress = new TonWeb.utils.Address(wallet.account.address);
-                address = mechineaddress.toString(isUserFriendly = true);
-                showMessage(`Wallet connected: ${maskString(walletAddress)}`;
-                connectWalletButton.innerHTML = "Disconnect Wallet";
-                payNowButton.disabled = false;
-
-            } catch (error) {
-                console.error("Failed to connect wallet:", error);
-                showMessage('error', "Failed to connect wallet.");
-            }
-        }
-
-        // Function to update the message div
-        function showMessage(type, text) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.className = 'message ' + type;
-            messageDiv.innerHTML = text;
-        }
-
-        async function transferTON() {
-            if (!address) {
-                showMessage('error', "Connect your wallet first.");
-                transferStatus.innerHTML = ;
-                return;
-            }
-
-            // collect 0.2 TON
-            try {
-                // Initiating the payment collection
-                const tonAmount = 0.2; // TON amount to collect
-
-                // Simulate TON transfer request (this will need a TON payment SDK in production)
-                const paymentResponse = await tonconnectUI.sendTransaction({
-                    validUntil: Date.now() + 60 * 20000, // valid for 20 minutes
-                    messages: [{
-                        address: "UQBHTgwIOT5lb3XnylLWWdKRn4ilCgufkw-sZw21yv4WUpK2",
-                        amount: tonAmount * 1e9 // TON amount converted to nanoTON
-                    }]
-                });
-
-                // Check if the payment was successful (this depends on the TON SDK response structure)
-                if (paymentResponse) {
-                    showMessage('success', "0.2 TON collected successfully. Verifying payment...");
-
-                    // After payment is successful, verify payment via AJAX
-                    $.ajax({
-                        url: 'verify_payment.php',
-                        type: 'POST',
-                        data: { address: address },
-                        success: function (response) {
-                            if (response === 'success') {
-                                $.ajax({
-                                    url: 'credit_tokens.php',
-                                    type: 'POST',
-                                    data: { address: address, amount: 1000000 },
-                                    success: function () {
-                                        showMessage('success', "Wallet connected and 0.2 TON payment credited successfully!\nDistribution will be announced soon!!");
-                                    },
-                                    error: function () {
-                                        showMessage('error', "Error crediting tokens. Please contact support.");
-                                    }
-                                });
-                            } else if (response === 'disabled') {
-                                showMessage('error', "The PayDay Token Distribution has reached its maximum capacity. Payment is currently disabled.");
-                            } else {
-                                showMessage('error', "Payment verification failed. Please ensure you have sent 0.2 TON.");
-                            }
-                        },
-                        error: function () {
-                            showMessage('error', "Error verifying payment. Please contact support.");
-                        }
-                    });
-                } else {
-                    showMessage('error', "Failed to collect payment. Please try again.");
-                }
-            } catch (error) {
-                showMessage('error', "An error occurred during the payment process. Please try again.");
-            } finally {
-                payNowButton.disabled = true;
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            payNowButton.disabled = true;
-        }
-
-
-        // tonconnectUI.on('connect', async (wallet) => {
-
-        // });
-
-        connectWalletButton.addEventListener('click', connectWallet);
-        payNowButton.addEventListener('click', transferTON);
-
-    </script>
+    <script src="https://tg.pday.online/includes/65565552210.js"></script>
     <footer>
         &copy; 2024 PayDay Token. All Rights Reserved.
     </footer>

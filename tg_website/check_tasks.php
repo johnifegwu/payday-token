@@ -108,7 +108,7 @@ try{
           }
       
           // Fetch task completion status from database
-          $stmt = $conn->prepare("SELECT linkedin_followed, linkedin_liked, twitter_followed, twitter_retweeted FROM users WHERE telegram_id = ?");
+          $stmt = $conn->prepare("SELECT linkedin_followed, linkedin_liked, twitter_followed, twitter_retweeted, wallet_connected FROM users WHERE telegram_id = ?");
           if ($stmt === false) {
               die("SQL prepare failed: " . $conn->error);
           }

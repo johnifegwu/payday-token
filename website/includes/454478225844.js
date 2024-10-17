@@ -107,6 +107,10 @@ async function connectWallet() {
     }
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function transferTON() {
     if (!tonWallet) {
         transferStatus.innerHTML = "Please connect your wallet first.";

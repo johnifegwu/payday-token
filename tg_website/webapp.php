@@ -1,207 +1,174 @@
 <?php
+
+// Load configuration
 $config = include('config.php');
 
-// Get environment variables for MySQL configuration
-$dbServer = $config['db_server'];
-$dbUser = $config['db_user'];
-$dbPassword = $config['db_password'];
-$dbName = $config['db_name'];
-
-//Post parameters
-$tgWebAppStartParam = "";
-$tgWebAppData = null;
-$chat_instance = null;
-$chat_type = null;
-$start_param = null;
-$auth_date = null;
-$hash = null;
-$tgWebAppVersion = null;
-$tgWebAppPlatform = null;
-$tgWebAppThemeParams = null;
-
-if (isset($_POST['full_url'])) {
-    // Get the full URL from the POST request
-    $full_url = $_POST['full_url'];
-
-    // Parse the URL to extract the parts (scheme, host, path, query, fragment)
-    $parsed_url = parse_url($full_url);
-
-    // Extract the query parameters (everything before the # sign)
-    parse_str($parsed_url['query'], $query_params);
-
-    // Assign query parameters to variables
-    $tgWebAppStartParam = $query_params['tgWebAppStartParam'] ?? null;
-
-    // If there's a fragment (everything after the # sign)
-    if (isset($parsed_url['fragment'])) {
-        // Parse the fragment part as a query string
-        $fragment = $parsed_url['fragment'];
-        parse_str($fragment, $fragment_params);
-
-        // Assign fragment parameters to variables
-        $tgWebAppData = $fragment_params['tgWebAppData'] ?? null;
-        $chat_instance = $fragment_params['chat_instance'] ?? null;
-        $chat_type = $fragment_params['chat_type'] ?? null;
-        $start_param = $fragment_params['start_param'] ?? null;
-        $auth_date = $fragment_params['auth_date'] ?? null;
-        $hash = $fragment_params['hash'] ?? null;
-        $tgWebAppVersion = $fragment_params['tgWebAppVersion'] ?? null;
-        $tgWebAppPlatform = $fragment_params['tgWebAppPlatform'] ?? null;
-        $tgWebAppThemeParams = $fragment_params['tgWebAppThemeParams'] ?? null;
-    }
-
-} else {
-    invalidRequestPage("full_url not set");
-}
-
-$sitekey = $config['site_key'];
-
-//Validate this request
-if (is_null($tgWebAppStartParam) || $tgWebAppStartParam != $sitekey) {
-    // serve the invalid page
-    invalidRequestPage("Invalid site key: $tgWebAppStartParam");
-}
-
 // Rate Limiting
-$under_construction = false; // Set to false after the site has gone live
+$under_construction = true; // Set to false after the site has gone live
 
 // Check if "isadmin=true" is passed in the request (GET or POST)
 if (isset($_REQUEST['isadmin']) && $_REQUEST['isadmin'] === 'true') {
     $under_construction = false;
 }
 
-// Rate Limiting Configuration
+// MySQL configuration from environment variables
+$dbServer = $config['db_server'];
+$dbUser = $config['db_user'];
+$dbPassword = $config['db_password'];
+$dbName = $config['db_name'];
+
+$totalEarned = 0;
+$actions = [
+    'enableLinkedInFollow' => true,
+    'enableLinkedInRepost' => false,
+    'enableTwitterFollow' => false,
+    'enableTwitterRepost' => false,
+    'walletConnected' => false
+];
+
+// Post parameters
+$postParams = [
+    'tgWebAppStartParam' => null,
+    'tgWebAppData' => null,
+    'chat_instance' => null,
+    'chat_type' => null,
+    'start_param' => null,
+    'auth_date' => null,
+    'hash' => null,
+    'tgWebAppVersion' => null,
+    'tgWebAppPlatform' => null,
+    'tgWebAppThemeParams' => null
+];
+
+// Handle full_url if set
+if (isset($_POST['full_url'])) {
+    $full_url = $_POST['full_url'];
+    $parsed_url = parse_url($full_url);
+
+    // Assign query and fragment parameters
+    if (isset($parsed_url['query'])) {
+        parse_str($parsed_url['query'], $query_params);
+        $postParams['tgWebAppStartParam'] = $query_params['tgWebAppStartParam'] ?? null;
+    }
+
+    if (isset($parsed_url['fragment'])) {
+        parse_str($parsed_url['fragment'], $fragment_params);
+        foreach ($fragment_params as $key => $value) {
+            $postParams[$key] = $value ?? null;
+        }
+    }
+} else {
+    invalidRequestPage("full_url not set");
+}
+
+$siteKey = $config['site_key'];
+
+// Validate the site key
+if (is_null($postParams['tgWebAppStartParam']) || $postParams['tgWebAppStartParam'] !== $siteKey) {
+    invalidRequestPage("Invalid site key: {$postParams['tgWebAppStartParam']}");
+}
+
+// Rate limiting setup
 $LIMIT = 5; // Max requests allowed
 $TIME_FRAME = 60; // Time frame in seconds
-
-// Get client's IP address
 $IP = $_SERVER['REMOTE_ADDR'];
 
 // Establish database connection using PDO
 try {
-    // Create the DSN (Data Source Name) string
     $dsn = "mysql:host=$dbServer;dbname=$dbName;charset=utf8mb4";
-    $db = new PDO($dsn, $dbUser, $dbPassword);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db = new PDO($dsn, $dbUser, $dbPassword, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
 
-    // Ensure the requests table exists
+    // Ensure the requests table exists and clean old entries
     createRequestsTable($db);
+    cleanUpOldRequests($db, time() - $TIME_FRAME);
 
-    // Current timestamp
-    $NOW = time();
-
-    // Clean up old entries and count current requests
-    cleanUpOldRequests($db, $NOW - $TIME_FRAME);
-    $COUNT = countRequests($db, $IP, $NOW - $TIME_FRAME);
-
-    // Check request limit
-    if ($COUNT >= $LIMIT) {
+    // Count current requests
+    if (countRequests($db, $IP, time() - $TIME_FRAME) >= $LIMIT) {
         sendRateLimitExceededResponse();
     }
 
-    // Log the request
-    logRequest($db, $IP, $NOW);
+    // Log the current request
+    logRequest($db, $IP, time());
 
-    // Serve the presale page if under construction
-    if ($under_construction) {
+    // Serve presale page if under construction
+    if ($underConstruction) {
         servePresalePage();
         exit;
     }
 
-    // Creating and interacting with the users table
+    // Ensure the users table exists
     createUsersTable($db);
 
 } catch (PDOException $e) {
-    echo "Connection failed: dbname=$dbName " . $e->getMessage();
+    echo "Connection failed: " . $e->getMessage();
+    exit;
 }
 
-// Telegram Integration
+// Telegram bot configuration
 $botToken = $config['bot_token'];
 $website = "https://api.telegram.org/bot" . $botToken;
 
-//Define tgWebAppData parameters
-if (is_null($tgWebAppData)) {
-    //serve invalid page
+// Validate tgWebAppData
+if (is_null($postParams['tgWebAppData'])) {
     invalidRequestPage("tgWebAppData is null");
 }
 
-// Remove the 'user=' prefix to get the JSON string
-$json_data = str_replace('user=', '', $tgWebAppData);
+// Extract and decode tgWebAppData
+$user_data = json_decode(str_replace('user=', '', $postParams['tgWebAppData']), true);
+if (!$user_data || !isset($user_data['id'])) {
+    invalidRequestPage("UserID is missing");
+}
 
-// Decode the JSON string into an associative array
-$user_data = json_decode($json_data, true);
-
-// Extract the desired values
-$UserID = $user_data['id'] ?? null;
+// Extract user data
+$UserID = $user_data['id'];
 $FirstName = $user_data['first_name'] ?? null;
 $LastName = $user_data['last_name'] ?? null;
 $UserName = $user_data['username'] ?? null;
 $Language = $user_data['language_code'] ?? null;
 
-if (is_null($UserID)) {
-    invalidRequestPage("UserID:$UserID");
-}
-
-// Check if session is already started
-if (session_status() == PHP_SESSION_NONE) {
+// Start session if not started
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 try {
-    // Check if the user exists in the database
+    // Check if user exists
     $stmt = $db->prepare("SELECT * FROM users WHERE telegram_id = ?");
-    $stmt->bindParam(1, $UserID, PDO::PARAM_STR);
+    $stmt->execute([$UserID]);
 
-    // Execute the query
-    if ($stmt->execute()) {
-        if ($stmt->rowCount() > 0) {
-            // User exists, track them in session
-            $_SESSION['telegram_id'] = $UserID;
-        } else {
-            // Insert the new user's Telegram ID
-            $stmt = $db->prepare("INSERT IGNORE INTO users (telegram_id, first_name, last_name, user_name, lang) 
-        VALUES (:telegram_id, :first_name, :last_name, :user_name, :lang)");
-
-            // Bind all parameters including the missing ':lang'
-            $stmt->bindParam(':telegram_id', $UserID, PDO::PARAM_STR);
-            $stmt->bindParam(':first_name', $FirstName, PDO::PARAM_STR);
-            $stmt->bindParam(':last_name', $LastName, PDO::PARAM_STR);
-            $stmt->bindParam(':user_name', $UserName, PDO::PARAM_STR);
-            $stmt->bindParam(':lang', $Language, PDO::PARAM_STR);  // Bind the missing ':lang'
-
-            // Execute the query and handle results
-            if ($stmt->execute()) {
-                $_SESSION['telegram_id'] = $UserID;
-
-                // Send a welcome message
-                $reply = "Hey $FirstName,\n\n";
-                $reply .= "Welcome to the PayDay Token Distribution!\n\n";
-                $reply .= "Click the PLAY button above to receive your 1,000,000 PDAY Tokens!\n\n";
-                $reply .= "Hurry, there's a limited distribution of PDAY Tokens.\n\n";
-                $reply .= "Follow us on LinkedIn to stay updated.";
-                $response = file_get_contents($website . "/sendMessage?chat_id=" . $chat_instance . "&text=" . urlencode($reply));
-
-                if ($response === false) {
-                    error_log("Failed to send message to Telegram chat_id: " . $chat_instance);
-                }
-            } else {
-                error_log("Error inserting user into the database: " . $stmt->errorInfo()[2]);
-            }
-        }
+    if ($stmt->rowCount() > 0) {
+        // User exists, fetch their data
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $_SESSION['telegram_id'] = $UserID;
+        $totalEarned = calculateEarnings($user, $actions);
     } else {
-        error_log("Error checking user existence: " . $stmt->errorInfo()[2]);
+        // Insert new user
+        $stmt = $db->prepare("INSERT INTO users (telegram_id, first_name, last_name, user_name, lang) 
+                              VALUES (:telegram_id, :first_name, :last_name, :user_name, :lang)");
+        $stmt->execute([
+            ':telegram_id' => $UserID,
+            ':first_name' => $FirstName,
+            ':last_name' => $LastName,
+            ':user_name' => $UserName,
+            ':lang' => $Language
+        ]);
+        $_SESSION['telegram_id'] = $UserID;
+
+        // Send welcome message
+        sendTelegramMessage($website, $postParams['chat_instance'], $FirstName);
     }
+
 } catch (PDOException $e) {
-    error_log("Error checking user existence: " . $e->getMessage());
-    invalidRequestPage("Error checking user existence: " . $e->getMessage());
+    error_log("Database error: " . $e->getMessage());
+    invalidRequestPage("Database error");
 }
 
-
+// Helper functions
 
 /**
- * Create the requests table if it doesn't exist.
- *
- * @param PDO $db
+ * Creates the requests table if it does not exist.
  */
 function createRequestsTable(PDO $db)
 {
@@ -213,53 +180,108 @@ function createRequestsTable(PDO $db)
 }
 
 /**
- * Clean up old request entries from the database.
- *
- * @param PDO $db
- * @param int $timestamp
+ * Cleans up old request entries.
  */
 function cleanUpOldRequests(PDO $db, int $timestamp)
 {
-    $stmt_cleanup = $db->prepare("DELETE FROM requests WHERE timestamp < :timestamp");
-    $stmt_cleanup->bindValue(':timestamp', $timestamp, PDO::PARAM_INT);
-    $stmt_cleanup->execute();
+    $stmt = $db->prepare("DELETE FROM requests WHERE timestamp < :timestamp");
+    $stmt->execute([':timestamp' => $timestamp]);
 }
 
 /**
- * Count the number of requests from a specific IP within the time frame.
- *
- * @param PDO $db
- * @param string $ip
- * @param int $timestamp
- * @return int
+ * Counts requests from a specific IP in the given timeframe.
  */
 function countRequests(PDO $db, string $ip, int $timestamp): int
 {
-    $stmt_count = $db->prepare("SELECT COUNT(*) FROM requests WHERE ip = :ip AND timestamp >= :timestamp");
-    $stmt_count->bindValue(':ip', $ip, PDO::PARAM_STR);
-    $stmt_count->bindValue(':timestamp', $timestamp, PDO::PARAM_INT);
-    $stmt_count->execute();
-    return (int) $stmt_count->fetchColumn();
+    $stmt = $db->prepare("SELECT COUNT(*) FROM requests WHERE ip = :ip AND timestamp >= :timestamp");
+    $stmt->execute([':ip' => $ip, ':timestamp' => $timestamp]);
+    return (int) $stmt->fetchColumn();
 }
 
 /**
- * Log a request in the database.
- *
- * @param PDO $db
- * @param string $ip
- * @param int $timestamp
+ * Logs a request.
  */
 function logRequest(PDO $db, string $ip, int $timestamp)
 {
-    $stmt_insert = $db->prepare("INSERT INTO requests (ip, timestamp) VALUES (:ip, :timestamp)");
-    $stmt_insert->bindValue(':ip', $ip, PDO::PARAM_STR);
-    $stmt_insert->bindValue(':timestamp', $timestamp, PDO::PARAM_INT);
-    $stmt_insert->execute();
+    $stmt = $db->prepare("INSERT INTO requests (ip, timestamp) VALUES (:ip, :timestamp)");
+    $stmt->execute([':ip' => $ip, ':timestamp' => $timestamp]);
 }
 
-function getTotalEarned(PDO $db, $telegramId){
-    $stmt_select = $db->prepare("SELECT tokens FROM users  WHERE telegram_id = ?");
+/**
+ * Calculates the total earnings for a user based on their actions.
+ */
+function calculateEarnings(array $user, array &$actions): int
+{
+    $total = $user['tokens'];
+
+    // Calculate based on LinkedIn actions
+    if ($user['linkedin_followed']) {
+        $actions['enableLinkedInFollow'] = false;
+        $total = 200000;
+    }
+    if ($user['linkedin_liked']) {
+        $actions['enableLinkedInRepost'] = false;
+        $total += 200000;
+    } else {
+        if (!$actions['enableLinkedInFollow']) {
+            $actions['enableLinkedInRepost'] = true;
+        }
+    }
+
+    // Calculate based on Twitter actions
+    if ($user['twitter_followed']) {
+        $actions['enableTwitterFollow'] = false;
+        $total += 200000;
+    } else {
+        if (!$actions['enableLinkedInRepost']) {
+            $actions['enableTwitterFollow'] = true;
+        }
+    }
+
+    if ($user['twitter_retweeted']) {
+        $actions['enableTwitterRepost'] = false;
+        $total += 200000;
+    } else {
+        if (!$actions['enableTwitterFollow']) {
+            $actions['enableTwitterRepost'] = true;
+        }
+    }
+
+    // Wallet connection
+    if ($user['wallet_connected']) {
+        $actions['walletConnected'] = false;
+        $total += 200000;
+    } else {
+        if (!$actions['enableTwitterRepost']) {
+            $actions['walletConnected'] = true;
+        }
+    }
+
+    $_SESSION['total'] = $total;
+    $_SESSION['enableLinkedInFollow'] = $actions['enableLinkedInFollow'] ? "true" : "false";
+    $_SESSION['enableLinkedInRepost'] = $actions['enableLinkedInRepost'] ? "true" : "false";
+    $_SESSION['enableTwitterFollow'] = $actions['enableTwitterFollow'] ? "true" : "false";
+    $_SESSION['enableTwitterRepost'] = $actions['enableTwitterRepost'] ? "true" : "false";
+    $_SESSION['walletConnected'] = $actions['walletConnected'] ? "true" : "false";
+
+    // Limit total earnings
+    return min($total, 1000000);
 }
+
+/**
+ * Sends a welcome message via Telegram.
+ */
+function sendTelegramMessage(string $website, string $chat_instance, string $firstName)
+{
+    $reply = "Hey $firstName,\n\n";
+    $reply .= "Welcome to the PayDay Token Distribution!\n\n";
+    $reply .= "Click the PLAY button above to receive your 1,000,000 PDAY Tokens!\n\n";
+    $reply .= "Hurry, there's a limited distribution of PDAY Tokens.\n\n";
+    $reply .= "Follow us on LinkedIn to stay updated.";
+
+    file_get_contents("$website/sendMessage?chat_id=$chat_instance&text=" . urlencode($reply));
+}
+
 
 /**
  * Send a response indicating that the rate limit has been exceeded.
@@ -357,12 +379,13 @@ function createUsersTable(PDO $db)
         .main-container {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             width: 100%;
             height: 100vh;
             padding: 0 20px;
             box-sizing: border-box;
+            overflow-y: auto;
         }
 
         .container {
@@ -374,6 +397,8 @@ function createUsersTable(PDO $db)
             max-width: 400px;
             text-align: center;
             overflow-y: auto;
+            margin-bottom: 80px;
+            /* To avoid overlap with bottom tab */
         }
 
         .links {
@@ -403,7 +428,7 @@ function createUsersTable(PDO $db)
             cursor: pointer;
             margin: 10px 0;
             width: 100%;
-            max-width: 200px;
+            max-width: 300px;
             font-size: 1em;
             font-weight: bold;
         }
@@ -448,34 +473,65 @@ function createUsersTable(PDO $db)
             text-align: center;
         }
 
-        /* Mobile-specific styling */
+        /* General styles for desktop and mobile */
+        .bottom-tab {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            /* Make sure it's above other elements */
+        }
+
+        .bottom-tab button {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100px;
+            font-size: 1em;
+        }
+
+        .bottom-tab button:hover {
+            background-color: #ffd700;
+        }
+
+        .bottom-tab button:disabled {
+            background-color: #333;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+
+        /* Mobile-specific adjustments */
         @media (max-width: 600px) {
-            body {
-                overflow-y: scroll;
+            .bottom-tab {
+                padding: 8px;
+                /* Reduce padding for mobile */
             }
 
-            .container {
-                height: 100vh;
-                box-sizing: border-box;
-            }
-
-            h1 {
-                font-size: 1.4em;
-            }
-
-            button {
+            .bottom-tab button {
+                width: 80px;
+                /* Smaller button width for mobile */
+                padding: 8px;
+                /* Reduce padding */
                 font-size: 0.9em;
+                /* Slightly smaller font size */
             }
 
-            .links {
-                font-size: 10px;
-            }
-
-            footer {
-                font-size: 10px;
+            .bottom-tab button:hover {
+                background-color: #ffdd33;
+                /* Slightly lighter hover effect for mobile */
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
@@ -484,31 +540,54 @@ function createUsersTable(PDO $db)
 
     <div class="container">
         <h1>PayDay Token Distribution!</h1>
-        <div id="telegram-id" style="text-align: left; color: #ffcc00; margin-bottom: 10px;">
-            TG ID: <span id="telegramIdDisplay"></span>
+        <div id="telegram-id"
+            style="display: flex; justify-content: space-between; align-items: center; color: #ffcc00; margin-bottom: 10px; margin-left: 20px; margin-right: 20px;">
+            <div style="text-align: left;">
+                TG ID: <span id="telegramIdDisplay"></span>
+            </div>
+            <div class="info" id="taskStatus" style="text-align: right;"></div>
         </div>
-        <p style="font-size: 18px; color: #ffcc00; font-weight: 600;">
+        <p style="font-size: 30px; color: #ffcc00; font-weight: 600;">
             $: <span id="token-count">0</span>
         </p>
-
         <button id="linkedInFollowBtn">Follow on LinkedIn 200,000 $PDAY</button>
         <button id="linkedInLikeBtn" disabled>Like and Repost our LinkedIn Post 200,000 $PDAY</button>
         <button id="twitterFoollowBtn" disabled>Follow us on Twitter 200,000 $PDAY</button>
         <button id="twitterRetweetBtn" disabled>Like and Retweet our Twitter Post 200,000 $PDAY</button>
         <button id="connectWalletBtn" disabled>Connect TON Wallet 200,000 tokens</button>
-
-        <div class="info" id="taskStatus"></div>
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://tg.pday.online/includes/545387treyt75545.js"></script>
     <script>
+        // Convert session values into actual booleans
         const telegramId = "<?php echo $_SESSION['telegram_id']; ?>";
+        const totalEearned = "<?php echo $_SESSION['total']; ?>";
+        const enableLinkedInFollow = "<?php echo $_SESSION['enableLinkedInFollow']; ?>" === 'true';
+        const enableLinkedInRepost = "<?php echo $_SESSION['enableLinkedInRepost']; ?>" === 'true';
+        const enableTwitterFollow = "<?php echo $_SESSION['enableTwitterFollow']; ?>" === 'true';
+        const enableTwitterRepost = "<?php echo $_SESSION['enableTwitterRepost']; ?>" === 'true';
+        const walletConnected = "<?php echo $_SESSION['walletConnected']; ?>" === 'true';
+
+        // Display telegram ID and token count
         document.getElementById('telegramIdDisplay').innerText = telegramId;
+        document.getElementById('token-count').innerText = totalEearned.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        // Enable/disable buttons based on session values
+        document.getElementById('linkedInFollowBtn').disabled = !enableLinkedInFollow;
+        document.getElementById('linkedInLikeBtn').disabled = !enableLinkedInRepost;
+        document.getElementById('twitterFoollowBtn').disabled = !enableTwitterFollow;
+        document.getElementById('twitterRetweetBtn').disabled = !enableTwitterRepost;
+        document.getElementById('connectWalletBtn').disabled = !walletConnected;
+
     </script>
-    <footer>
-        &copy; 2024 PayDay Token. All Rights Reserved.
-    </footer>
+    <!-- Fixed bottom tab bar -->
+    <div class="bottom-tab">
+        <button id="homeBtn"><i class="fas fa-home"></i><br>Home</button>
+        <button id="profileBtn" disabled><i class="fas fa-user"></i><br>Profile</button>
+        <button id="settingsBtn" disabled><i class="fas fa-cog"></i><br>Settings</button>
+        <!-- <button><i class="fas fa-search"></i><br>Search</button> -->
+    </div>
 
 </body>
 

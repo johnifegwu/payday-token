@@ -7,6 +7,11 @@ use mysqli;
 require_once 'vendor/autoload.php';
 $config = include('config.php');
 
+// Start session if not started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Configuration
 $SERVERNAME = $config['db_server'];
 $USERNAME = $config['db_user'];
@@ -100,9 +105,10 @@ function hasValidTransaction($address, $requiredAmount, $walletAddress, $apiKey)
   
 
 // Update user wallet status in the database
-function updateUserWalletStatus($conn, $address) {
-    $stmt = $conn->prepare("UPDATE users SET wallet_connected = TRUE WHERE ton_wallet = ?");
+function updateUserWalletStatus($conn, $address, $telegramId) {
+    $stmt = $conn->prepare("UPDATE users SET wallet_connected = TRUE, ton_wallet = ? WHERE telegram_id");
     $stmt->bind_param("s", $address);
+    $stmt->bind_param("s", $telegramId);
     $stmt->execute();
 }
 
@@ -124,7 +130,7 @@ try {
             } else {
     
                 if (hasValidTransaction($address, $REQUIRED_AMOUNT,  $PAYDAY_TOKEN_WALLET, $TON_API_KEY)) {
-                    updateUserWalletStatus($conn, $address);
+                    updateUserWalletStatus($conn, $address,$telegramId);
                     echo "success";
                 } else {
                     echo "failed";

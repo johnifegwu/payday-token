@@ -3,6 +3,12 @@
 session_start();
 
 $config = include('config.php');
+
+// Start session if not started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Get environment variables for MySQL configuration
 $dbServer = $config['db_server'];
 $$dbServer = $config['db_user'];

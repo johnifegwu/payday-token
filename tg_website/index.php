@@ -155,7 +155,7 @@ function servePresalePage()
 
         // Send the updated full URL to the server using an AJAX request
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "webapp.php", true);  // Replace with your PHP script path
+        xhr.open("POST", "webapp.php", true);  // PHP script path
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
         // Define what happens when the server responds

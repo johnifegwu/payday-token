@@ -22,6 +22,14 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+// Rate Limiting
+$cmdtype = "wallet_connected"; // Set to false after the site has gone live
+
+// Check if "isadmin=true" is passed in the request (GET or POST)
+if (isset($_REQUEST['cmdtype']) && !empty($_REQUEST['cmdtype'])) {
+    $cmdtype = $_REQUEST['cmdtype'];
+}
+
 try{
     if (isset($_SESSION['telegram_id'])) {
         $telegramId = $_SESSION['telegram_id'];
@@ -47,7 +55,7 @@ try{
       
           if ($lastAPICall === null || time() - strtotime($lastAPICall) >= $rateLimitSeconds) {
             // LinkedIn verification
-            $linkedin_followed = checkLinkedInFollow($telegramId, "payday-token", "LINKEDIN_API_KEY");
+            $linkedin_followed = ($cmdtype == "all"  || $cmdtype == "linkedin_followed")? checkLinkedInFollow($telegramId, "payday-token", "LINKEDIN_API_KEY") : false;
             if ($linkedin_followed) {
               $stmt = $conn->prepare("UPDATE users SET linkedin_followed = TRUE WHERE telegram_id = ?");
               if ($stmt === false) {
@@ -59,7 +67,7 @@ try{
               }
             }
       
-            $linkedin_liked = checkLinkedInLike($telegramId, "7250768314702979072-HXD9", "LINKEDIN_API_KEY");
+            $linkedin_liked = ($cmdtype == "all"  || $cmdtype == "linkedin_liked")? checkLinkedInLike($telegramId, "7250768314702979072-HXD9", "LINKEDIN_API_KEY") : false;
             if ($linkedin_liked) {
               $stmt = $conn->prepare("UPDATE users SET linkedin_liked = TRUE WHERE telegram_id = ?");
               if ($stmt === false) {
@@ -72,7 +80,7 @@ try{
             }
       
             // Twitter verification (replace with actual API calls)
-            $twitter_followed = checkTwitterFollow($telegramId, "token_payday", "TWITTER_API_KEY");
+            $twitter_followed = ($cmdtype == "all"  || $cmdtype == "twitter_followed")? checkTwitterFollow($telegramId, "token_payday", "TWITTER_API_KEY"):false;
             if ($twitter_followed) {
               $stmt = $conn->prepare("UPDATE users SET twitter_followed = TRUE WHERE telegram_id = ?");
               if ($stmt === false) {
@@ -84,7 +92,7 @@ try{
               }
             }
       
-            $twitter_retweeted = checkTwitterRetweet($telegramId, "1844054521590534308", "TWITTER_API_KEY");
+            $twitter_retweeted = ($cmdtype == "all"  || $cmdtype == "twitter_retweeted")? checkTwitterRetweet($telegramId, "1844054521590534308", "TWITTER_API_KEY") : false;
             if ($twitter_retweeted) {
               $stmt = $conn->prepare("UPDATE users SET twitter_retweeted = TRUE WHERE telegram_id = ?");
               if ($stmt === false) {

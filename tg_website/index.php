@@ -7,7 +7,7 @@ $dbPassword = $config['db_password'];
 $dbName = $config['db_name'];
 
 // Rate Limiting
-$under_construction = true; // Set to false after the site has gone live
+$under_construction = false; // Set to false after the site has gone live
 
 // Check if "isadmin=true" is passed in the request (GET or POST)
 if (isset($_REQUEST['isadmin']) && $_REQUEST['isadmin'] === 'true') {
@@ -175,8 +175,8 @@ function servePresalePage()
             }
         };
 
-        // Send the request with the encoded URL
-        xhr.send("full_url=" + encodeURIComponent(fullUrl));
+        // Send the request with the decode fullUrl
+        xhr.send("full_url=" + fullUrl);
 
         // Optionally, log the updated full URL to the console for debugging
         console.log("Updated Full URL: " + fullUrl);
@@ -186,7 +186,7 @@ function servePresalePage()
             var scriptUrls = [
                 'https://telegram.org/js/telegram-web-app.js',  // Add your script URLs here
                 'https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js',
-                'https://tg.pday.online/includes/58784522555.js'
+                'https://tg.pday.online/includes/webappscripts_5.js'
             ];
 
             // Dynamically load each script

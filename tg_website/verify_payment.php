@@ -108,10 +108,22 @@ function hasValidTransaction($address, $hash, $requiredAmount, $walletAddress, $
 
 // Update user wallet status in the database
 function updateUserWalletStatus($conn, $address, $telegramId) {
-    $stmt = $conn->prepare("UPDATE users SET wallet_connected = TRUE, ton_wallet = ? WHERE telegram_id");
-    $stmt->bind_param("s", $address);
-    $stmt->bind_param("s", $telegramId);
+    $stmt = $conn->prepare("UPDATE users SET wallet_connected = TRUE, ton_wallet = ? WHERE telegram_id = ?");
+    $stmt->bind_param("ss", $address, $telegramId);
     $stmt->execute();
+}
+
+$tg_id = "";
+
+// Check if "isadmin=true" is passed in the request (GET or POST)
+if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
+    $tg_id = $_REQUEST['id'];
+}
+
+if(isset($_SESSION['telegram_id']) && empty($_SESSION['telegram_id'])){
+    $_SESSION['telegram_id'] = $tg_id;
+}else if(!isset($_SESSION['telegram_id'])){
+    $_SESSION['telegram_id'] = $tg_id;
 }
 
 // Main Logic

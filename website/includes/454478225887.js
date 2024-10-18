@@ -14,6 +14,7 @@ let tonConnectUI;
 let tonWallet = false;
 let lastTxHash
 let walletAddress
+let address;
 
 function getDeviceType() {
     if (/android/i.test(userAgent)) {
@@ -89,7 +90,7 @@ async function connectWallet() {
 
         const currentAccount = tonConnectUI.account;
         tonWallet = true;
-        const address = new TonWeb.utils.Address(currentAccount.address);
+        address = new TonWeb.utils.Address(currentAccount.address);
         walletAddress = address.toString(isUserFriendly = true);
         walletStatus.innerHTML = `Wallet connected: ${maskString(walletAddress)}`;
         connectWalletButton.innerHTML = "Disconnect Wallet";

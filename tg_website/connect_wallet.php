@@ -4,11 +4,6 @@
 
 $config = include('config.php');
 
-// Start session if not started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 // Get environment variables for MySQL configuration
 $dbServer = $config['db_server'];
 $dbUser = $config['db_user'];
@@ -19,8 +14,27 @@ $dbName = $config['db_name'];
 $distributionLimit = 70000;
 $paidUsersCount = 0;
 
+// Start session if not started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$tg_id = ""; // Set to false after the site has gone live
+
+// Check if "isadmin=true" is passed in the request (GET or POST)
+if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
+    $tg_id = $_REQUEST['id'];
+}
+
+if(isset($_SESSION['telegram_id']) && empty($_SESSION['telegram_id'])){
+    $_SESSION['telegram_id'] = $tg_id;
+}else if(!isset($_SESSION['telegram_id'])){
+    $_SESSION['telegram_id'] = $tg_id;
+}
+
 if (isset($_SESSION['telegram_id'])) {
     $telegramId = $_SESSION['telegram_id'];
+
     $conn = new mysqli($dbServer, $dbUser, $dbPassword, $dbName);
 
     // Check connection
@@ -48,6 +62,7 @@ if (isset($_SESSION['telegram_id'])) {
 
 } else {
     echo json_encode(['error' => 'User not logged in']);
+    exit;
 }
 
 ?>
@@ -297,8 +312,13 @@ if (isset($_SESSION['telegram_id'])) {
             <div id="message" class="message"></div>
         <?php } ?>
     </div>
+    <input type="hidden" id="tg_id" name="tg_id">
     <script src="https://pday.online/dist/tonweb.js"></script>
-    <script src="https://tg.pday.online/includes/65565552210.js"></script>
+    <script src="https://tg.pday.online/includes/wallet_scripts_3.js"></script>
+    <script>
+        var telegramId = "<?php echo $_SESSION['telegram_id']; ?>";
+        document.getElementById('tg_id').value = telegramId;
+    </script>
     <footer>
         &copy; 2024 PayDay Token. All Rights Reserved.
     </footer>

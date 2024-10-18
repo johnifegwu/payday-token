@@ -4,7 +4,7 @@
 $config = include('config.php');
 
 // Rate Limiting
-$under_construction = true; // Set to false after the site has gone live
+$under_construction = false; // Set to false after the site has gone live
 
 // Check if "isadmin=true" is passed in the request (GET or POST)
 if (isset($_REQUEST['isadmin']) && $_REQUEST['isadmin'] === 'true') {
@@ -65,7 +65,7 @@ $siteKey = $config['site_key'];
 
 // Validate the site key
 if (is_null($postParams['tgWebAppStartParam']) || $postParams['tgWebAppStartParam'] !== $siteKey) {
-    invalidRequestPage("Invalid site key: {$postParams['tgWebAppStartParam']}");
+    invalidRequestPage("Invalid site key");
 }
 
 // Rate limiting setup
@@ -118,7 +118,7 @@ if (is_null($postParams['tgWebAppData'])) {
 // Extract and decode tgWebAppData
 $user_data = json_decode(str_replace('user=', '', $postParams['tgWebAppData']), true);
 if (!$user_data || !isset($user_data['id'])) {
-    invalidRequestPage("UserID is missing");
+    invalidRequestPage("UserID is missing.");
 }
 
 // Extract user data
@@ -214,56 +214,65 @@ function calculateEarnings(array $user, array &$actions): int
 {
     $total = $user['tokens'];
 
-    // Calculate based on LinkedIn actions
     if ($user['linkedin_followed']) {
-        $actions['enableLinkedInFollow'] = false;
-        $total = 200000;
-    }
-    if ($user['linkedin_liked']) {
-        $actions['enableLinkedInRepost'] = false;
-        $total += 200000;
-    } else {
-        if (!$actions['enableLinkedInFollow']) {
-            $actions['enableLinkedInRepost'] = true;
+        // Calculate based on LinkedIn actions
+        if ($user['linkedin_followed']) {
+            $actions['enableLinkedInFollow'] = false;
+            $total = 200000;
         }
-    }
-
-    // Calculate based on Twitter actions
-    if ($user['twitter_followed']) {
-        $actions['enableTwitterFollow'] = false;
-        $total += 200000;
-    } else {
-        if (!$actions['enableLinkedInRepost']) {
-            $actions['enableTwitterFollow'] = true;
+        if ($user['linkedin_liked']) {
+            $actions['enableLinkedInRepost'] = false;
+            $total += 200000;
+        } else {
+            if (!$actions['enableLinkedInFollow']) {
+                $actions['enableLinkedInRepost'] = true;
+            }
         }
-    }
 
-    if ($user['twitter_retweeted']) {
-        $actions['enableTwitterRepost'] = false;
-        $total += 200000;
-    } else {
-        if (!$actions['enableTwitterFollow']) {
-            $actions['enableTwitterRepost'] = true;
+        // Calculate based on Twitter actions
+        if ($user['twitter_followed']) {
+            $actions['enableTwitterFollow'] = false;
+            $total += 200000;
+        } else {
+            if (!$actions['enableLinkedInRepost']) {
+                $actions['enableTwitterFollow'] = true;
+            }
         }
-    }
 
-    // Wallet connection
-    if ($user['wallet_connected'] && $user["tokens"] >= 1000000) {
-        $actions['walletConnected'] = false;
-        $total += 200000;
-    } else {
-        if (!$actions['enableTwitterRepost']) {
-            $actions['walletConnected'] = true;
+        if ($user['twitter_retweeted']) {
+            $actions['enableTwitterRepost'] = false;
+            $total += 200000;
+        } else {
+            if (!$actions['enableTwitterFollow']) {
+                $actions['enableTwitterRepost'] = true;
+            }
         }
+
+        // Wallet connection
+        if ($user['wallet_connected'] && $user["tokens"] >= 1000000) {
+            $actions['walletConnected'] = false;
+            $total += 200000;
+        } else {
+            if (!$actions['enableTwitterRepost']) {
+                $actions['walletConnected'] = true;
+            }
+        }
+        $_SESSION['total'] = $total;
+        $_SESSION['enableLinkedInFollow'] = $actions['enableLinkedInFollow'] ? "true" : "false";
+        $_SESSION['enableLinkedInRepost'] = $actions['enableLinkedInRepost'] ? "true" : "false";
+        $_SESSION['enableTwitterFollow'] = $actions['enableTwitterFollow'] ? "true" : "false";
+        $_SESSION['enableTwitterRepost'] = $actions['enableTwitterRepost'] ? "true" : "false";
+        $_SESSION['walletConnected'] = $actions['walletConnected'] ? "true" : "false";
+    } else {
+        $_SESSION['total'] = 0;
+        $_SESSION['enableLinkedInFollow'] = "true";
+        $_SESSION['enableLinkedInRepost'] = "false";
+        $_SESSION['enableTwitterFollow'] = "false";
+        $_SESSION['enableTwitterRepost'] = "false";
+        $_SESSION['walletConnected'] = "false";
     }
 
-    $_SESSION['total'] = $total;
-    $_SESSION['enableLinkedInFollow'] = $actions['enableLinkedInFollow'] ? "true" : "false";
-    $_SESSION['enableLinkedInRepost'] = $actions['enableLinkedInRepost'] ? "true" : "false";
-    $_SESSION['enableTwitterFollow'] = $actions['enableTwitterFollow'] ? "true" : "false";
-    $_SESSION['enableTwitterRepost'] = $actions['enableTwitterRepost'] ? "true" : "false";
-    $_SESSION['walletConnected'] = $actions['walletConnected'] ? "true" : "false";
-
+    $_SESSION['first_name'] = $user['first_name'] ? $user['first_name'] :'';
     // Limit total earnings
     return min($total, 1000000);
 }
@@ -362,183 +371,211 @@ function createUsersTable(PDO $db)
     <title>PayDay Token</title>
     <link rel="icon" href="https://tg.pday.online/imgs/paydayicon.png" type="image/png">
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #1a1a1a;
-        color: #d4af37;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        overflow-x: hidden;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #d4af37;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
 
-    .main-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        width: 100%;
-        height: 100vh;
-        padding: 0 20px;
-        box-sizing: border-box;
-        overflow-y: auto;
-    }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            padding: 0 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
 
-    .container {
-        background-color: #262626;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
-        overflow-y: auto;
-        margin-bottom: 80px;
-        /* To avoid overlap with bottom tab */
-    }
+        .container {
+            background-color: #262626;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            overflow-y: auto;
+            margin-bottom: 80px;
+            /* To avoid overlap with bottom tab */
+        }
 
-    .links {
-        margin-top: 20px;
-        font-size: 12px;
-        text-align: center;
-        padding-bottom: 20px;
-    }
+        .links {
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+            padding-bottom: 20px;
+        }
 
-    h1 {
-        color: #ffcc00;
-        font-size: 1.6em;
-        margin-bottom: 15px;
-    }
+        h1 {
+            color: #ffcc00;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+        }
 
-    p {
-        color: #d4af37;
-        font-size: 1em;
-    }
+        p {
+            color: #d4af37;
+            font-size: 1em;
+        }
 
-    button {
-        background-color: #ffcc00;
-        color: #1a1a1a;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin: 10px 0;
-        width: 100%;
-        max-width: 300px;
-        font-size: 1em;
-        font-weight: bold;
-    }
+        button {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+            font-size: 1em;
+            font-weight: bold;
+        }
 
-    button:hover {
-        background-color: #ffd700;
-    }
+        button:hover {
+            background-color: #ffd700;
+        }
 
-    button:disabled {
-        background-color: #333;
-        color: rgba(255, 255, 255, 0.3);
-        cursor: not-allowed;
-    }
+        button:disabled {
+            background-color: #333;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
 
-    .info {
-        margin: 15px 0;
-    }
+        .info {
+            margin: 15px 0;
+        }
 
-    .logo {
-        margin-bottom: 15px;
-        max-width: 60%;
-        height: auto;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
+        .logo {
+            margin-bottom: 15px;
+            max-width: 60%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    .links a {
-        color: #ffcc00;
-        text-decoration: none;
-        margin: 0 5px;
-    }
+        .links a {
+            color: #ffcc00;
+            text-decoration: none;
+            margin: 0 5px;
+        }
 
-    .links a:hover {
-        text-decoration: underline;
-    }
+        .links a:hover {
+            text-decoration: underline;
+        }
 
-    footer {
-        font-size: 12px;
-        color: #d4af37;
-        padding: 10px;
-        text-align: center;
-    }
+        footer {
+            font-size: 12px;
+            color: #d4af37;
+            padding: 10px;
+            text-align: center;
+        }
 
-    /* General styles for desktop and mobile */
-    .bottom-tab {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: #333;
-        display: flex;
-        justify-content: space-around;
-        padding: 10px;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        /* Make sure it's above other elements */
-    }
-
-    .bottom-tab button {
-        background-color: #ffcc00;
-        color: #1a1a1a;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        width: 100px;
-        font-size: 1em;
-    }
-
-    .bottom-tab button:hover {
-        background-color: #ffd700;
-    }
-
-    /* Inactive button styling */
-    .bottom-tab button.inactive {
-        background-color: #b39733; /* Dimmed gold color */
-        color: #4d4d4d; /* Darker text */
-        opacity: 0.7; /* Slightly transparent to indicate inactivity */
-        cursor: pointer; /* Maintain clickable */
-    }
-
-    .bottom-tab button.inactive:hover {
-        background-color: #d4af37; /* Brighter gold on hover */
-        color: #1a1a1a; /* Dark text */
-        opacity: 1; /* Fully opaque on hover */
-    }
-
-    /* Mobile-specific adjustments */
-    @media (max-width: 600px) {
+        /* General styles for desktop and mobile */
         .bottom-tab {
-            padding: 8px;
-            /* Reduce padding for mobile */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            /* Make sure it's above other elements */
         }
 
         .bottom-tab button {
-            width: 80px;
-            /* Smaller button width for mobile */
-            padding: 8px;
-            /* Reduce padding */
-            font-size: 0.9em;
-            /* Slightly smaller font size */
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100px;
+            font-size: 1em;
         }
 
         .bottom-tab button:hover {
-            background-color: #ffdd33;
-            /* Slightly lighter hover effect for mobile */
+            background-color: #ffd700;
         }
-    }
-</style>
+
+        /* Inactive button styling */
+        .bottom-tab button.inactive {
+            background-color: #b39733;
+            /* Dimmed gold color */
+            color: #4d4d4d;
+            /* Darker text */
+            opacity: 0.7;
+            /* Slightly transparent to indicate inactivity */
+            cursor: pointer;
+            /* Maintain clickable */
+        }
+
+        .bottom-tab button.inactive:hover {
+            background-color: #d4af37;
+            /* Brighter gold on hover */
+            color: #1a1a1a;
+            /* Dark text */
+            opacity: 1;
+            /* Fully opaque on hover */
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 600px) {
+            .bottom-tab {
+                padding: 8px;
+                /* Reduce padding for mobile */
+            }
+
+            .bottom-tab button {
+                width: 80px;
+                /* Smaller button width for mobile */
+                padding: 8px;
+                /* Reduce padding */
+                font-size: 0.9em;
+                /* Slightly smaller font size */
+            }
+
+            .bottom-tab button:hover {
+                background-color: #ffdd33;
+                /* Slightly lighter hover effect for mobile */
+            }
+        }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
@@ -551,7 +588,7 @@ function createUsersTable(PDO $db)
         <div id="telegram-id"
             style="display: flex; justify-content: space-between; align-items: center; color: #ffcc00; margin-bottom: 10px; margin-left: 20px; margin-right: 20px;">
             <div style="text-align: left;">
-                TG ID: <span id="telegramIdDisplay"></span>
+                <span id="telegramIdDisplay"></span>
             </div>
             <div class="info" id="taskStatus" style="text-align: right;"></div>
         </div>
@@ -559,17 +596,19 @@ function createUsersTable(PDO $db)
             $PDAY <span id="token-count">0</span>
         </p>
         <button id="linkedInFollowBtn">Follow on LinkedIn 200,000 $PDAY</button>
-        <button id="linkedInLikeBtn" disabled>Like and Repost our LinkedIn Post 200,000 $PDAY</button>
+        <button id="linkedInLikeBtn" disabled>Join our Community 200,000 $PDAY</button>
         <button id="twitterFoollowBtn" disabled>Follow us on Twitter 200,000 $PDAY</button>
         <button id="twitterRetweetBtn" disabled>Like and Retweet our Twitter Post 200,000 $PDAY</button>
         <button id="connectWalletBtn" disabled>Connect TON Wallet 200,000 tokens</button>
+        <input type="hidden" id="tg_id" name="tg_id">
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://tg.pday.online/includes/58784522555.js"></script>
+    <script src="https://tg.pday.online/includes/webappscripts_5.js"></script>
     <script>
         // Convert session values into actual booleans
         const telegramId = "<?php echo $_SESSION['telegram_id']; ?>";
+        const first_name = '<?php echo $_SESSION['first_name']; ?>';
         const totalEearned = "<?php echo $_SESSION['total']; ?>";
         const enableLinkedInFollow = "<?php echo $_SESSION['enableLinkedInFollow']; ?>" === 'true';
         const enableLinkedInRepost = "<?php echo $_SESSION['enableLinkedInRepost']; ?>" === 'true';
@@ -578,7 +617,8 @@ function createUsersTable(PDO $db)
         const walletConnected = "<?php echo $_SESSION['walletConnected']; ?>" === 'true';
 
         // Display telegram ID and token count
-        document.getElementById('telegramIdDisplay').innerText = telegramId;
+        document.getElementById('tg_id').value = telegramId;
+        document.getElementById('telegramIdDisplay').innerText = first_name;
         document.getElementById('token-count').innerText = totalEearned.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
         // Enable/disable buttons based on session values
@@ -587,29 +627,21 @@ function createUsersTable(PDO $db)
         document.getElementById('twitterFoollowBtn').disabled = !enableTwitterFollow;
         document.getElementById('twitterRetweetBtn').disabled = !enableTwitterRepost;
         document.getElementById('connectWalletBtn').disabled = !walletConnected;
-        const presaleBtn = document.getElementById('presaleBtn');
-        presaleBtn.disabled = false;
-
-        // Enable the button after the Telegram web app is ready
-        window.Telegram?.WebApp.onEvent('webAppReady', function () {
-            const inviteBtn = document.getElementById('inviteBtn');
-            inviteBtn.disabled = false;
-
-            inviteBtn.addEventListener('click', function () {
-                // Replace 'YOUR_INVITE_LINK' with the actual invite link you want to share
-                const inviteLink = 'https://t.me/paydaytokenbot';
-
-                window.Telegram.WebApp.share({
-                    url: inviteLink,
-                    text: 'Join our PayDay Token Distribution!',
-                    show_alert: true
-                });
-            });
-        });
+        var inviteLink = 'https://t.me/paydaytokenbot';
+        var inviteText = '🌟 Join the PayDay Token Revolution! 🌟\n\n';
+        inviteText += 'Get in on the ground floor of PayDay Token and secure your path to financial success. Participate in\n';
+        inviteText += 'our presale or distribution and you could soon be counting millions while others watch in awe!\n';
+        inviteText += "Don't miss out on this chance to be part of something BIG!\n\n";
+        inviteText += '💸 Click here to join now!n\n';
+        //html encode inviteText and inviteLink
+        inviteText = encodeURIComponent(inviteText);
+        inviteLink = encodeURIComponent(inviteLink);
+        // concact the two strings
+        const shareurl = `https://t.me/share/url?url=${inviteLink}&text=${inviteText}`
 
         // Add click event for presaleBtn
         function presale() {
-            window.open('https://pday.online', '_blank');
+            //window.open('https://pday.online');
         }
 
         // Function to handle button state switching
@@ -630,6 +662,7 @@ function createUsersTable(PDO $db)
 
         document.getElementById('inviteBtn').addEventListener('click', function () {
             activateButton('inviteBtn');
+            window.open(shareurl, '_blank');
         });
 
         document.getElementById('presaleBtn').addEventListener('click', function () {
@@ -642,7 +675,7 @@ function createUsersTable(PDO $db)
     <div class="bottom-tab">
         <button id="homeBtn" class="active"><i class="fas fa-home"></i><br>Home</button>
         <button id="inviteBtn" class="inactive"><i class="fas fa-share"></i><br>Invite</button>
-        <button id="presaleBtn" class="inactive"><i class="fas fa-money-bill-alt"></i><br>Presale</button>
+        <button id="presaleBtn" class="inactive"><i class="fas fa-money-bill-alt"></i><br>Profile</button>
     </div>
 
 </body>

@@ -116,41 +116,51 @@ async function transferTON() {
             txHash = tx.transaction_id.hash
         }
 
+        var tgId = document.getElementById('tg_id').value;
+
         // Check if the payment was successful (this depends on the TON SDK response structure)
         if (paymentResponse) {
             showMessage('success', "0.2 TON collected successfully. Verifying payment...");
 
-            // After payment is successful, verify payment via AJAX
-            $.ajax({
-                url: 'verify_payment.php',
-                type: 'POST',
-                data: { address: address, hash: hashBase64, checkLimit: ""  },
-                success: function (response) {
-                    if (response === 'success') {
-                        $.ajax({
-                            url: 'credit_tokens.php',
-                            type: 'POST',
-                            data: { address: address, amount: 1000000 },
-                            success: function () {
-                                showMessage('success', "Wallet connected and 0.2 TON payment credited successfully!\nDistribution will be announced soon!!");
-                            },
-                            error: function () {
-                                showMessage('error', "Error crediting tokens. Please contact support.");
-                            }
-                        });
-                    } else if (response === 'disabled') {
-                        showMessage('error', "The PayDay Token Distribution has reached its maximum capacity. Payment is currently disabled.");
+            // After payment is successful, verify payment via XMLHttpRequest
+            var xhrVerify = new XMLHttpRequest();
+            xhrVerify.open('POST', `verify_payment.php?id=${tgId}`, true);
+            xhrVerify.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhrVerify.onreadystatechange = function () {
+                if (xhrVerify.readyState === 4) {
+                    if (xhrVerify.status === 200) {
+                        var response = xhrVerify.responseText;
+                        if (response === 'success') {
+                            var xhrCredit = new XMLHttpRequest();
+                            xhrCredit.open('POST', `credit_tokens.php?id=${tgId}`, true);
+                            xhrCredit.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                            xhrCredit.onreadystatechange = function () {
+                                if (xhrCredit.readyState === 4) {
+                                    if (xhrCredit.status === 200) {
+                                        showMessage('success', "Wallet connected and 0.2 TON payment credited successfully!\nDistribution will be announced soon!!");
+                                    } else {
+                                        showMessage('error', "Error crediting tokens. Please contact support.");
+                                    }
+                                }
+                            };
+                            xhrCredit.send("address=" + encodeURIComponent(address) + "&amount=1000000");
+                        } else if (response === 'disabled') {
+                            showMessage('error', "The PayDay Token Distribution has reached its maximum capacity. Payment is currently disabled.");
+                        } else if (response === 'failed'){
+                            showMessage('error', "Error crediting tokens. Please contact support.");
+                        }else {
+                            showMessage('error', `Payment verification failed. Please ensure you have sent 0.2 TON. \n${response}`);
+                        }
                     } else {
-                        showMessage('error', "Payment verification failed. Please ensure you have sent 0.2 TON.");
+                        showMessage('error', "Error verifying payment. Please contact support.");
                     }
-                },
-                error: function () {
-                    showMessage('error', "Error verifying payment. Please contact support.");
                 }
-            });
+            };
+            xhrVerify.send("address=" + encodeURIComponent(address) + "&hash=" + encodeURIComponent(hashBase64) + "&checkLimit=");
         } else {
             showMessage('error', "Failed to collect payment. Please try again.");
         }
+
     } catch (error) {
         connectWalletButton.disabled = false;
         payNowButton.disabled = true;
@@ -162,26 +172,36 @@ async function transferTON() {
 }
 
 async function checkLimit() {
-    $.ajax({
-        url: 'verify_payment.php',
-        type: 'POST',
-        data: { address: "", hash: "", checkLimit: "true" },
-        success: function (response) {
-            if (response === 'disabled') {
-                var msg = "<p>We have reached the maximum number of participants for the PayDay Token Distribution.</p>";
-                msg += "<p>Thank you for your interest!</p>";
-                // Disable payment as limit has been reached.
-                connectWalletButton.disabled = true;
-                payNowButton.disabled = true;
-                showMessage('error', msg);
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'verify_payment.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var response = xhr.responseText;
+                if (response === 'disabled') {
+                    var msg = "<p>We have reached the maximum number of participants for the PayDay Token Distribution.</p>";
+                    msg += "<p>Thank you for your interest!</p>";
+                    // Disable payment as limit has been reached.
+                    connectWalletButton.disabled = true;
+                    payNowButton.disabled = true;
+                    showMessage('error', msg);
+                }
+            } else {
+                console.error("Error verifying limit:", xhr.statusText);
+                console.error("Server response:", xhr.responseText);
             }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Error verifying limit:", textStatus, errorThrown);
-            console.error("Server response:", jqXHR.responseText);  // Logs the actual server response
         }
-    });
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed");
+    };
+
+    xhr.send("address=&hash=&checkLimit=true");
 }
+
 
 // tonconnectUI.on('connect', async (wallet) => {
 

@@ -14,6 +14,19 @@ $dbUser = $config['db_user'];
 $dbPassword = $config['db_password'];
 $dbName = $config['db_name'];
 
+$tg_id = ""; // Set to false after the site has gone live
+
+// Check if "isadmin=true" is passed in the request (GET or POST)
+if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
+    $tg_id = $_REQUEST['id'];
+}
+
+if(isset($_SESSION['telegram_id']) && empty($_SESSION['telegram_id'])){
+    $_SESSION['telegram_id'] = $tg_id;
+}else if(!isset($_SESSION['telegram_id'])){
+    $_SESSION['telegram_id'] = $tg_id;
+}
+
 if (isset($_SESSION['telegram_id'])) {
     $telegramId = $_SESSION['telegram_id'];
 

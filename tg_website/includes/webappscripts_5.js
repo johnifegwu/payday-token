@@ -9,7 +9,7 @@ const taskStatus = document.getElementById("taskStatus");
 const linkedInPageUrl = "https://www.linkedin.com/company/payday-token/about/?viewAsMember=true";
 const linkedInPostUrl = "https://t.me/tokenpayday";
 const tqitterProfileUrl = "https://x.com/token_payday";
-const twitterPostUrl = "https://x.com/token_payday/status/1846268435397071251";
+const twitterPostUrl = "https://x.com/token_payday/status/1847372578597589501";
 
 function checkTaskCompletion(taskName, currentButton, nextButton, taskStatus, url) {
     // taskStatus is now a normal DOM element

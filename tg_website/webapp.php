@@ -272,7 +272,7 @@ function calculateEarnings(array $user, array &$actions): int
         $_SESSION['walletConnected'] = "false";
     }
 
-    $_SESSION['first_name'] = $user['first_name'] ? $user['first_name'] :'';
+    $_SESSION['first_name'] = $user['first_name'] ? $user['first_name'] : '';
     // Limit total earnings
     return min($total, 1000000);
 }
@@ -457,6 +457,7 @@ function createUsersTable(PDO $db)
         }
 
         .logo {
+            margin-top: 15px;
             margin-bottom: 15px;
             max-width: 60%;
             height: auto;
@@ -544,6 +545,48 @@ function createUsersTable(PDO $db)
             margin-left: 10px;
         }
 
+        /* Base styles for larger screens */
+        .header {
+            background-image: url('imgs/tg_banner.png');
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        /* Mobile styles (for screens less than 768px wide) */
+        @media (max-width: 768px) {
+            .header {
+                height: 180px;
+                /* Adjust the height for smaller screens */
+                background-size: contain;
+                /* Ensure the image is fully visible */
+            }
+
+            h1 {
+                font-size: 1.4em;
+                /* Smaller font size for mobile */
+            }
+        }
+
+        /* Extra small devices (for screens less than 480px wide) */
+        @media (max-width: 480px) {
+            .header {
+                height: 150px;
+                padding: 10px;
+                /* Add padding to give space for smaller screens */
+            }
+
+            h1 {
+                font-size: 1.2em;
+            }
+        }
+
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -580,19 +623,19 @@ function createUsersTable(PDO $db)
 </head>
 
 <body>
-
-    <img src="imgs/PayDay_banner.png" alt="PayDay Token Logo" class="logo">
-
+    <div class="header">
+        <img src="imgs/PayDay_banner.png" alt="PayDay Token Logo" class="logo">
+    </div>
     <div class="container">
         <h1>PayDay Token Distribution!</h1>
         <div id="telegram-id"
-            style="display: flex; justify-content: space-between; align-items: center; color: #ffcc00; margin-bottom: 10px; margin-left: 20px; margin-right: 20px;">
+            style="display: flex; justify-content: space-between; align-items: center; color: #ffcc00; margin-bottom: 5px; margin-left: 40px; margin-right: 20px;">
             <div style="text-align: left;">
                 <span id="telegramIdDisplay"></span>
             </div>
             <div class="info" id="taskStatus" style="text-align: right;"></div>
         </div>
-        <p style="font-size: 30px; color: #ffcc00; font-weight: 600;">
+        <p style="font-size: 30px; color: #ffcc00; font-weight: 500;">
             $PDAY <span id="token-count">0</span>
         </p>
         <button id="linkedInFollowBtn">Follow on LinkedIn 200,000 $PDAY</button>

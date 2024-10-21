@@ -26,9 +26,9 @@ if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
     $tg_id = $_REQUEST['id'];
 }
 
-if(isset($_SESSION['telegram_id']) && empty($_SESSION['telegram_id'])){
+if (isset($_SESSION['telegram_id']) && empty($_SESSION['telegram_id'])) {
     $_SESSION['telegram_id'] = $tg_id;
-}else if(!isset($_SESSION['telegram_id'])){
+} else if (!isset($_SESSION['telegram_id'])) {
     $_SESSION['telegram_id'] = $tg_id;
 }
 
@@ -163,6 +163,7 @@ if (isset($_SESSION['telegram_id'])) {
         }
 
         .logo {
+            margin-top: 15px;
             margin-bottom: 15px;
             max-width: 60%;
             height: auto;
@@ -242,6 +243,7 @@ if (isset($_SESSION['telegram_id'])) {
         .error {
             border-color: #f44336;
         }
+
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-top: 4px solid #d4af37;
@@ -253,14 +255,45 @@ if (isset($_SESSION['telegram_id'])) {
             margin-left: 10px;
         }
 
+
+        /* Base styles for larger screens */
+        .header {
+            background-image: url('imgs/tg_banner.png');
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        /* Mobile styles (for screens less than 768px wide) */
+        @media (max-width: 768px) {
+            .header {
+                height: 180px;
+                /* Adjust the height for smaller screens */
+                background-size: contain;
+                /* Ensure the image is fully visible */
+            }
+
+            h1 {
+                font-size: 1.4em;
+                /* Smaller font size for mobile */
+            }
+        }
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
             }
+
             100% {
                 transform: rotate(360deg);
             }
         }
+
         /* Mobile-specific adjustments */
         @media (max-width: 600px) {
             .bottom-tab {
@@ -291,9 +324,12 @@ if (isset($_SESSION['telegram_id'])) {
 </head>
 
 <body>
-    <div class="logo">
-        <img src="imgs/PayDay_banner.png" alt="PayDay Token Logo" width="100%" height="100%">
+    <div class="header">
+        <div class="logo">
+            <img src="imgs/PayDay_banner.png" alt="PayDay Token Logo" width="100%" height="100%">
+        </div>
     </div>
+
     <div class="container">
         <h1>Connect Your TON Wallet</h1>
 

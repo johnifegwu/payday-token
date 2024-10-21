@@ -581,7 +581,7 @@ function createUsersTable(PDO $db)
 
 <body>
 
-    <img src="imgs/payday.png" alt="PayDay Token Logo" class="logo">
+    <img src="imgs/PayDay_banner.png" alt="PayDay Token Logo" class="logo">
 
     <div class="container">
         <h1>PayDay Token Distribution!</h1>

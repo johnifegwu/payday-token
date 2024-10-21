@@ -292,7 +292,7 @@ if (isset($_SESSION['telegram_id'])) {
 
 <body>
     <div class="logo">
-        <img src="imgs/payday.png" alt="PayDay Token Logo" width="100%" height="100%">
+        <img src="imgs/PayDay_banner.png" alt="PayDay Token Logo" width="100%" height="100%">
     </div>
     <div class="container">
         <h1>Connect Your TON Wallet</h1>

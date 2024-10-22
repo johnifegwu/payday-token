@@ -41,7 +41,7 @@ function isPaymentLimitReached($conn, $PAYMENT_LIMIT) {
 }
 
 
-function hasValidTransaction($address, $hash, $requiredAmount, $walletAddress, $apiKey) {
+function hasValidTransaction($address, $hash, $requiredAmount, $walletAddress, $apiKey, $ton_divisor) {
     $endpoint = "getTransactions";
     $params = [
       'address' => $walletAddress,
@@ -56,7 +56,7 @@ function hasValidTransaction($address, $hash, $requiredAmount, $walletAddress, $
         // Check if 'in_msg' exists in the transaction
         if (isset($transaction['in_msg']['source']) && isset($transaction['in_msg']['value'])) {
           $source = $transaction['in_msg']['source'];
-          $amount = $transaction['in_msg']['value'] / 1000000000; // Assuming TON_DIVISOR is 10^9
+          $amount = $transaction['in_msg']['value'] / $ton_divisor; // Assuming TON_DIVISOR is 10^9
   
           if ($source === $address && $amount == $requiredAmount) {
             return true;
@@ -65,9 +65,8 @@ function hasValidTransaction($address, $hash, $requiredAmount, $walletAddress, $
       }
     }
 
-    //If get here we just go ahead and return true, we will verify manually
     // as we might have exceeded the server limit
-    return true; 
+    return false; 
   }
 
   function getToncenterData($endpoint, $params = [], $apiKey = '') {
@@ -152,7 +151,7 @@ try {
                 }
             }else {
     
-                if (hasValidTransaction($address, $hash, $REQUIRED_AMOUNT,  $PAYDAY_TOKEN_WALLET, $TON_API_KEY)) {
+                if (hasValidTransaction($address, $hash, $REQUIRED_AMOUNT,  $PAYDAY_TOKEN_WALLET, $TON_API_KEY, $TON_DIVISOR)) {
                     updateUserWalletStatus($conn, $address,$telegramId);
                     echo "success";
                 } else {

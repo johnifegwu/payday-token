@@ -9,6 +9,7 @@ const userAgent = navigator.userAgent;
 const android = "Android";
 const ios = "iOS";
 const desktop = "Desktop";
+const obfuscatedSiteKey = 'M2M5YTVmOTdmMTBiNGY4NzlkMTQyMWU2MWQ4NDNmNGQ='; 
 
 let tonConnectUI;
 let tonWallet = false;
@@ -131,8 +132,12 @@ async function transferTON() {
             ]
         }
 
-        const result = await tonConnectUI.sendTransaction(transaction);
+        const paymentResponse = await tonConnectUI.sendTransaction(transaction);
         transferStatus.innerHTML = 'Confirming transaction... <div class="spinner"></div>';
+
+        //Get the transaction
+        const bocCellBytes = await TonWeb.boc.Cell.oneFromBoc(TonWeb.utils.base64ToBytes(paymentResponse.boc)).hash();
+        const hashBase64 = TonWeb.utils.bytesToBase64(bocCellBytes);
 
         // Run a loop until user's last tx hash changes
         var txHash = lastTxHash
@@ -141,7 +146,10 @@ async function transferTON() {
             let tx = (await tonweb.getTransactions(address, 1))[0]
             txHash = tx.transaction_id.hash
         }
-
+        
+        let sitekey = decodeSiteKey();
+        //Log the transaction
+        await submitTransaction(walletAddress, hashBase64, amountTON, sitekey);
         transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.\n${maskString(txHash)}`;
     } catch (error) {
         console.error("Failed to transfer TON:", error);
@@ -169,6 +177,117 @@ function validateBuyNowButton() {
     buyNowButton.disabled = !(tonWallet && amount >= 0.7 && amount <= 5000);
 }
 
+function submitTransaction(walletAddress, transactionHash, TONAmountPaid, siteKey) {
+    const data = {
+        walletAddress: walletAddress,
+        transactionHash: transactionHash,
+        TONAmountPaid: TONAmountPaid,
+        SiteKey: siteKey
+    };
+
+    // Create a new XMLHttpRequest object
+    const xhr = new XMLHttpRequest();
+    
+    // Configure it: POST-request for the URL /presalelog.php
+    xhr.open('POST', 'https://pday.online/presalelog.php', true);
+    
+    // Set the request header
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    
+    // Set up a handler for the response
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            const result = xhr.responseText.trim();
+            if (result === "Transaction recorded successfully!") {
+                console.log("Transaction recorded successfully!");
+            } else {
+                console.error("Error: ", result);
+                // Handle error response
+            }
+        } else {
+            console.error("Request failed. Status:", xhr.status);
+            // Handle HTTP errors
+        }
+    };
+
+    // Set up a handler for network errors
+    xhr.onerror = function () {
+        console.error("Request failed");
+        // Handle network errors
+    };
+
+    // Serialize the data to URL-encoded format
+    const urlEncodedData = new URLSearchParams(data).toString();
+
+    // Send the request with the serialized data
+    xhr.send(urlEncodedData);
+}
+
+function decodeSiteKey() {
+    return atob(obfuscatedSiteKey);
+}
+
+function fetchTotalPayDayBought(siteKey) {
+    // Create a new FormData object
+    const formData = new FormData();
+    formData.append('sitekey', siteKey);
+
+    // Create a new XMLHttpRequest object
+    const xhr = new XMLHttpRequest();
+
+    // Configure it: POST-request for the URL /totalpaydaybought.php
+    xhr.open('POST', 'https://pday.online/totalpaydaybought.php', true);
+
+    // Set up a handler for the response
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            // Parse the JSON response
+            const data = JSON.parse(xhr.responseText);
+            if (data.error) {
+                console.error("Error:", data.error);
+                alert(data.error); // Alert the error
+            } else {
+                let totalPayDayBought = parseFloat(data.totalPayDayBought) || 0;
+                if(totalPayDayBought < 1047592){
+                    totalPayDayBought += 1047592;
+                }
+                const cappedLimit = 1_000_000_000; // 1 billion
+                const statusBar = document.getElementById("statusBar");
+                const progressPercentage = (totalPayDayBought / cappedLimit) * 100;
+
+                // Update status bar
+                statusBar.style.width = progressPercentage + "%";
+                statusBar.textContent = `$${totalPayDayBought.toFixed(2)}`;
+
+                if (totalPayDayBought >= cappedLimit) {
+                    statusBar.textContent = "Sale limit reached!";
+                    statusBar.style.backgroundColor = "red"; // Change color to indicate limit reached
+                    console.log("Color changed to red.");
+                } else {
+                    statusBar.style.backgroundColor = "#d4af37"; // Normal color
+                    console.log("Color changed to solid gold.");
+                }
+
+                console.log("Total PayDayTokens Bought on this site:", totalPayDayBought);
+            }
+        } else {
+            console.error("Request failed. Status:", xhr.status);
+            alert("An error occurred: " + xhr.statusText); // Alert fetch error
+        }
+    };
+
+    // Set up a handler for network errors
+    xhr.onerror = function () {
+        console.error("Request failed");
+        alert("An error occurred during the request."); // Alert network error
+    };
+
+    // Send the request with the FormData
+    xhr.send(formData);
+}
+
+const siteKey = decodeSiteKey();
+fetchTotalPayDayBought(siteKey);
 connectWalletButton.addEventListener('click', connectWallet);
 buyNowButton.addEventListener('click', transferTON);
 tonInput.addEventListener('input', validateBuyNowButton);

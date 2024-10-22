@@ -1,25 +1,29 @@
 <?php
+// Load configuration file
 $config = include('config.php');
 
-// Database credentials
+// Fetch current round and database credentials
+$current_round = $config['round'];
 $servername = $config['db_server'];
 $username = $config['db_user'];
 $password = $config['db_password'];
 $dbname = $config['db_name'];
 $validSiteKey = $config['site_key']; // Set your SiteKey for validation
 
-// Create connection with error handling
+// Establish a secure connection with error handling
 $conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check for connection error
 if ($conn->connect_error) {
-    error_log("Connection failed: " . $conn->connect_error);
+    error_log("Database connection failed: " . $conn->connect_error);
     die(json_encode(["error" => "Database connection failed. Please try again later."]));
 }
 
-// POST parameter
+// Get the POST parameter with fallback
 $siteKey = $_POST['sitekey'] ?? null;
 
-// Input validation
-if (!$siteKey) {
+// Input validation for siteKey
+if (empty($siteKey)) {
     die(json_encode(["error" => "Missing sitekey parameter."]));
 }
 
@@ -28,10 +32,22 @@ if ($siteKey !== $validSiteKey) {
     die(json_encode(["error" => "Invalid Site Key."]));
 }
 
-// Fetch the sum of PayDayTokenDue
-$query = "SELECT SUM(PayDayTokenDue) AS totalPayDayBought FROM transactions";
-$result = $conn->query($query);
+// Use prepared statements to prevent SQL injection
+$query = "SELECT SUM(PayDayTokenDue) AS totalPayDayBought FROM transactions WHERE Round = ?";
+$stmt = $conn->prepare($query);
 
+// Check if the prepared statement was successful
+if (!$stmt) {
+    error_log("Prepare failed: " . $conn->error);
+    die(json_encode(["error" => "Error preparing query."]));
+}
+
+// Bind the parameter and execute the query
+$stmt->bind_param('s', $current_round);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Check for query execution errors
 if ($result) {
     $row = $result->fetch_assoc();
     $totalPayDayBought = $row['totalPayDayBought'] ?? 0; // Default to 0 if no records
@@ -41,6 +57,7 @@ if ($result) {
     die(json_encode(["error" => "Error fetching total PayDayTokenDue."]));
 }
 
-// Close connection
+// Close the statement and connection
+$stmt->close();
 $conn->close();
 ?>

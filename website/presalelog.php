@@ -4,6 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 $config = include('config.php');
 
+$current_round = $config['round'];
 // Database credentials
 $servername = $config['db_server'];
 $username = $config['db_user'];
@@ -57,7 +58,9 @@ try {
             TONAmountPaid DECIMAL(18, 8) NOT NULL,
             USDTValueOfTONPaid DECIMAL(18, 8),
             USDTPerPayDayToken DECIMAL(18, 8),
-            PayDayTokenDue DECIMAL(18, 8)
+            PayDayTokenDue DECIMAL(18, 8),
+            Round VARCHAR(255) DEFAULT '1st round',
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ";
         if (!$conn->query($createTableQuery)) {
@@ -87,8 +90,8 @@ try {
     // Insert data into the database with prepared statement error handling
     $insertQuery = $conn->prepare("
     INSERT INTO transactions 
-    (WalletAddress, TransactionHash, TONAmountPaid, USDTValueOfTONPaid, USDTPerPayDayToken, PayDayTokenDue) 
-    VALUES (?, ?, ?, ?, ?, ?)
+    (WalletAddress, TransactionHash, TONAmountPaid, USDTValueOfTONPaid, USDTPerPayDayToken, PayDayTokenDue, Round) 
+    VALUES (?, ?, ?, ?, ?, ?, ?)
 ");
 
     if ($insertQuery === false) {
@@ -97,13 +100,14 @@ try {
     }
 
     $insertQuery->bind_param(
-        "ssdddd",
+        "ssdddds",
         $walletAddress,
         $transactionHash,
         $tonAmountPaid,
         $usdtValueOfTON,
         $payDayPresalePrice,
-        $payDayTokenDue
+        $payDayTokenDue,
+        $current_round
     );
 
     if ($insertQuery->execute()) {

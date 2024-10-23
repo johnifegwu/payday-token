@@ -9,7 +9,6 @@ const userAgent = navigator.userAgent;
 const android = "Android";
 const ios = "iOS";
 const desktop = "Desktop";
-const obfuscatedSiteKey = 'M2M5YTVmOTdmMTBiNGY4NzlkMTQyMWU2MWQ4NDNmNGQ='; 
 
 let tonConnectUI;
 let tonWallet = false;

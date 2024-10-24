@@ -10,12 +10,16 @@ $password = $config['db_password'];
 $dbname = $config['db_name'];
 $validSiteKey = $config['site_key']; // Set your SiteKey for validation
 
-// Establish a secure connection with error handling
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check for connection error
-if ($conn->connect_error) {
-    error_log("Database connection failed: " . $conn->connect_error);
+// Establish a secure PDO connection with error handling
+try {
+    $dsn = "mysql:host=$servername;dbname=$dbname;charset=utf8mb4";
+    $pdo = new PDO($dsn, $username, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // Enable exceptions for errors
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // Fetch associative arrays by default
+        PDO::ATTR_EMULATE_PREPARES => false, // Disable emulated prepares
+    ]);
+} catch (PDOException $e) {
+    error_log("Database connection failed: " . $e->getMessage());
     die(json_encode(["error" => "Database connection failed. Please try again later."]));
 }
 
@@ -33,31 +37,22 @@ if ($siteKey !== $validSiteKey) {
 }
 
 // Use prepared statements to prevent SQL injection
-$query = "SELECT SUM(PayDayTokenDue) AS totalPayDayBought FROM transactions WHERE Round = ?";
-$stmt = $conn->prepare($query);
+$query = "SELECT SUM(PayDayTokenDue) AS totalPayDayBought FROM transactions WHERE Round = :round";
 
-// Check if the prepared statement was successful
-if (!$stmt) {
-    error_log("Prepare failed: " . $conn->error);
-    die(json_encode(["error" => "Error preparing query."]));
-}
-
-// Bind the parameter and execute the query
-$stmt->bind_param('s', $current_round);
-$stmt->execute();
-$result = $stmt->get_result();
-
-// Check for query execution errors
-if ($result) {
-    $row = $result->fetch_assoc();
+try {
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['round' => $current_round]);
+    
+    // Fetch the result
+    $row = $stmt->fetch();
     $totalPayDayBought = $row['totalPayDayBought'] ?? 0; // Default to 0 if no records
+    
     echo json_encode(["totalPayDayBought" => $totalPayDayBought]);
-} else {
-    error_log("Error fetching data: " . $conn->error);
+
+} catch (PDOException $e) {
+    error_log("Error executing query: " . $e->getMessage());
     die(json_encode(["error" => "Error fetching total PayDayTokenDue."]));
 }
 
-// Close the statement and connection
-$stmt->close();
-$conn->close();
+// No need to explicitly close the connection; PDO will handle it automatically
 ?>

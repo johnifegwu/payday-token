@@ -250,7 +250,11 @@ function fetchTotalPayDayBought(siteKey) {
                 if(totalPayDayBought < 1047592){
                     totalPayDayBought += 1047592;
                 }
-                const cappedLimit = 10_000_000; // 10 million per round
+                let cappedLimit = 10_000_000;
+                const maxX = 10_000_000_000; // 10 billion per round
+                if (totalPayDayBought >= 0.7 * cappedLimit) {
+                    cappedLimit = Math.min(totalPayDayBought + 10_000_000, maxX);
+                }
                 const statusBar = document.getElementById("statusBar");
                 const progressPercentage = (totalPayDayBought / cappedLimit) * 100;
 

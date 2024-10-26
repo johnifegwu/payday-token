@@ -642,7 +642,7 @@ function createUsersTable(PDO $db)
         <button id="linkedInLikeBtn" disabled>Join our Community 200,000 $PDAY</button>
         <button id="twitterFoollowBtn" disabled>Follow us on Twitter 200,000 $PDAY</button>
         <button id="twitterRetweetBtn" disabled>Like and Retweet our Twitter Post 200,000 $PDAY</button>
-        <button id="connectWalletBtn" disabled>Connect TON Wallet 200,000 tokens</button>
+        <button id="connectWalletBtn" disabled>Connect TON Wallet 200,000 $PDAY</button>
         <input type="hidden" id="tg_id" name="tg_id">
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>

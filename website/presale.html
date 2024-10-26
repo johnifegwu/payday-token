@@ -269,51 +269,70 @@
 
     <div class="container">
         <div class="logo">
-            <img src="imgs/payday.png" alt="PayDay Token Logo" width="100%" height="100%">
+          <img src="imgs/payday.png" alt="PayDay Token Logo" width="100%" height="100%">
         </div>
-        <h1>PayDay Token Presale</h1>
-        <p>Presale Price: <strong>$0.0006 per PDAY</strong></p>
-        <p>Expected Listing Price: <strong>$0.001 per PDAY</strong></p>
-        <p>Minimum TON Required: <strong>0.7 TON</strong></p>
-
+        <h1 id="mainHeading">PayDay Token Presale</h1>
+        <p id="presalePrice">Presale Price: <strong>$0.0006 per PDAY</strong></p>
+        <p id="listingPrice">Expected Listing Price: <strong>$0.001 per PDAY</strong></p>
+        <p id="minTON">Minimum TON Required: <strong>0.7 TON</strong></p>
+    
         <div class="input-container">
-            <input type="number" id="tonInput" min="0.7" max="5000" placeholder="Enter TON amount" />
+          <input type="number" id="tonInput" min="0.7" max="5000" placeholder="Enter TON amount" />
         </div>
         <div class="info" id="walletStatus"></div>
         <div class="info" id="transferStatus"></div>
         <button id="buyNowButton" disabled>Buy Now</button>
         <button id="connectWalletButton">Connect Wallet</button>
-        <p>PDAY Tokens Bought (1st Round)</p>
+        <p id="tokensBought">PDAY Tokens Bought (1st Round)</p>
         <div id="statusContainer">
-            <div id="statusBar">$0.00</div>
+          <div id="statusBar">$0.00</div>
         </div>
         <div class="info" style="font-style: italic; color: #D3D3D3;">
-            <p>Use Telegram Wallet on mobile devices.</p>
-            <p>The rest of the Wallets works fine on Desktop.</p>
+          <p id="telegramInfo">Use Telegram Wallet on mobile devices.</p>
+          <p id="walletInfo">The rest of the Wallets works fine on Desktop.</p>
         </div>
         <script src="https://pday.online/includes/secret.js"></script>
         <script src="https://pday.online/dist/tonweb.js"></script>
-        <script src="https://pday.online/includes/454478225887_11.js"></script>
+        <script src="https://pday.online/includes/454478225887_12.js"></script>
         <div class="exchanges-section">
-            <h2>Available on Exchanges</h2>
-            <div class="exchange-list">
-                <div class="exchange-item">
-                    <a href="https://blockspot.io/coin/payday-2/" target="_blank">
-                        <img src="imgs/blockspot.png" alt="Blockspot" class="exchange-logo">
-                        <span></span>
-                    </a>
-                </div>
-                <!-- Add more exchanges similarly -->
+          <h2 id="exchangesHeading">Available on Exchanges</h2>
+          <div class="exchange-list">
+            <div class="exchange-item">
+              <a href="https://blockspot.io/coin/payday-2/" target="_blank">
+                <img src="imgs/blockspot.png" alt="Blockspot" class="exchange-logo">
+                <span></span>
+              </a>
+            </div>
             </div>
         </div>
         <div class="links">
-            <a href="https://pday.online/whitepaper.pdf" target="_blank">Whitepaper</a> |
-            <a href="https://x.com/token_payday?t=c9pgwx_ikva8vBwWTNm8EA&s=09" target="_blank">Twitter</a> |
-            <a href="https://www.linkedin.com/company/payday-token/?viewAsMember=true" target="_blank">LinkedIn</a>|
-            <a href="https://t.me/tokenpayday" target="_blank">Telegram</a>
+          <a href="https://pday.online/whitepaper.pdf" target="_blank">Whitepaper</a> |
+          <a href="https://x.com/token_payday?t=c9pgwx_ikva8vBwWTNm8EA&s=09" target="_blank">Twitter</a> |
+          <a href="https://www.linkedin.com/company/payday-token/?viewAsMember=true" target="_blank">LinkedIn</a>|
+          <a href="https://t.me/tokenpayday" target="_blank">Telegram</a>
         </div>
-    </div>
-
+      </div>
+    
+      <script>
+    
+        function updateContent() {
+          const browserLanguage = getBrowserLanguage();
+          if (browserLanguage.startsWith('zh')) { 
+            document.getElementById('mainHeading').textContent = "PayDay 代币预售";
+            document.getElementById('presalePrice').textContent = "预售价格：每 PDAY 0.0006 美元";
+            document.getElementById('listingPrice').textContent = "预计上市价格：每 PDAY 0.001 美元";
+            document.getElementById('minTON').textContent = "最低 TON 要求：0.7 TON";
+            document.getElementById('buyNowButton').textContent = "立即购买";
+            document.getElementById('connectWalletButton').textContent = "连接钱包";
+            document.getElementById('tokensBought').textContent = "已购买的 PDAY 代币（第一轮）";
+            document.getElementById('telegramInfo').textContent = "在移动设备上使用 Telegram 钱包。";
+            document.getElementById('walletInfo').textContent = "其余的钱包在桌面上运行良好。";
+            document.getElementById('exchangesHeading').textContent = "可在交易所购买";
+          }
+        }
+    
+        updateContent(); 
+      </script>
 </body>
 
 </html>

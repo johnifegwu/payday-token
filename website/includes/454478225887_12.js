@@ -67,54 +67,62 @@ window.onload = async function () {
 
 async function connectWallet() {
     try {
-        if (!tonConnectUI) {
-            walletStatus.innerHTML = "TonConnectUI not initialized.";
-            return;
-        }
-
-        const currentIsConnectedStatus = tonConnectUI.connected;
-
-        if(currentIsConnectedStatus){
-            await tonConnectUI.disconnect(); // disconnect any previously connected wallet
-        }
-
-        
-        if(connectWalletButton.innerHTML == "Disconnect Wallet"){
-            tonWallet = false;
-            connectWalletButton.innerHTML = "Connect Wallet"
-            walletStatus.innerHTML = "";
-            return;
-        }
-
-        await tonConnectUI.connectWallet();
-
-        const currentAccount = tonConnectUI.account;
-        tonWallet = true;
-        address = new TonWeb.utils.Address(currentAccount.address);
-        walletAddress = address.toString(isUserFriendly = true);
-        walletStatus.innerHTML = `Wallet connected: ${maskString(walletAddress)}`;
-        connectWalletButton.innerHTML = "Disconnect Wallet";
-
-        // Get user's last transaction hash using tonweb
-        const lastTx = (await tonweb.getTransactions(address, 1))[0]
-        // we use if in case of new wallet.
-        if(lastTx){
-            lastTxHash = lastTx.transaction_id.hash
-        }
-        validateBuyNowButton();
+      let lang = getBrowserLanguage().toLowerCase();
+      let language = lang.startsWith('zh') ? 'cn' : 'en';
+  
+      if (!tonConnectUI) {
+        walletStatus.innerHTML = language === 'cn' ? "TonConnectUI 未初始化。" : "TonConnectUI not initialized.";
+        return;
+      }
+  
+      const currentIsConnectedStatus = tonConnectUI.connected;
+  
+      if (currentIsConnectedStatus) {
+        await tonConnectUI.disconnect(); // disconnect any previously connected wallet
+      }
+  
+      if (connectWalletButton.innerHTML == (language === 'cn' ? "断开钱包连接" : "Disconnect Wallet")) {
+        tonWallet = false;
+        connectWalletButton.innerHTML = language === 'cn' ? "连接钱包" : "Connect Wallet";
+        walletStatus.innerHTML = "";
+        return;
+      }
+  
+      await tonConnectUI.connectWallet();
+  
+      const currentAccount = tonConnectUI.account;
+      tonWallet = true;
+      address = new TonWeb.utils.Address(currentAccount.address);
+      walletAddress = address.toString(isUserFriendly = true);
+      walletStatus.innerHTML = language === 'cn' ? `钱包已连接: ${maskString(walletAddress)}` : `Wallet connected: ${maskString(walletAddress)}`;
+      connectWalletButton.innerHTML = language === 'cn' ? "断开钱包连接" : "Disconnect Wallet";
+  
+      // Get user's last transaction hash using tonweb
+      const lastTx = (await tonweb.getTransactions(address, 1))[0]
+      // we use if in case of new wallet.
+      if (lastTx) {
+        lastTxHash = lastTx.transaction_id.hash
+      }
+      validateBuyNowButton();
     } catch (error) {
-        console.error("Failed to connect wallet:", error);
-        walletStatus.innerHTML = "Failed to connect wallet.";
+      console.error("Failed to connect wallet:", error);
+      walletStatus.innerHTML = language === 'cn' ? "连接钱包失败。" : "Failed to connect wallet.";
     }
-}
+  }
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getBrowserLanguage() {
+    return navigator.language || navigator.userLanguage; 
+}
+
 async function transferTON() {
+    let lang = getBrowserLanguage().toLowerCase();
+    let language = lang.startsWith('zh') ? 'cn' : 'en';
     if (!tonWallet) {
-        transferStatus.innerHTML = "Please connect your wallet first.";
+        transferStatus.innerHTML = language === 'cn' ? "请先连接您的钱包。" : "Please connect your wallet first.";
         return;
     }
 
@@ -132,7 +140,7 @@ async function transferTON() {
         }
 
         const paymentResponse = await tonConnectUI.sendTransaction(transaction);
-        transferStatus.innerHTML = 'Confirming transaction... <div class="spinner"></div>';
+        transferStatus.innerHTML = language === 'cn' ? '正在确认交易... <div class="spinner"></div>' : 'Confirming transaction... <div class="spinner"></div>';
 
         //Get the transaction
         const bocCellBytes = await TonWeb.boc.Cell.oneFromBoc(TonWeb.utils.base64ToBytes(paymentResponse.boc)).hash();
@@ -145,14 +153,21 @@ async function transferTON() {
             let tx = (await tonweb.getTransactions(address, 1))[0]
             txHash = tx.transaction_id.hash
         }
-        
+
         let sitekey = decodeSiteKey();
         //Log the transaction
         await submitTransaction(walletAddress, hashBase64, amountTON, sitekey);
-        transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.\n${maskString(txHash)}`;
+
+        // Conditional message based on language
+        if (language === 'cn') {
+            transferStatus.innerHTML = `转账成功！您已发送 ${amountTON} TON。\n${maskString(hashBase64)}`;
+        } else {
+            transferStatus.innerHTML = `Transfer successful! You have sent ${amountTON} TON.\n${maskString(hashBase64)}`;
+        }
+
     } catch (error) {
         console.error("Failed to transfer TON:", error);
-        transferStatus.innerHTML = "Failed to transfer TON.";
+        transferStatus.innerHTML = language === 'cn' ? "转账失败。" : "Failed to transfer TON.";
     }
 }
 

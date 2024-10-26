@@ -627,9 +627,8 @@ function createUsersTable(PDO $db)
         <img src="imgs/PayDay_banner.png" alt="PayDay Token Logo" class="logo">
     </div>
     <div class="container">
-        <h1>PayDay Token Distribution!</h1>
-        <div id="telegram-id"
-            style="display: flex; justify-content: space-between; align-items: center; color: #ffcc00; margin-bottom: 5px; margin-left: 40px; margin-right: 20px;">
+        <h1 id="mainHeading">PayDay Token Distribution!</h1>
+        <div id="telegram-id" style="display: flex; justify-content: space-between; align-items: center; color: #ffcc00; margin-bottom: 5px; margin-left: 40px; margin-right: 20px;">
             <div style="text-align: left;">
                 <span id="telegramIdDisplay"></span>
             </div>
@@ -647,7 +646,7 @@ function createUsersTable(PDO $db)
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://tg.pday.online/includes/webappscripts_5.js"></script>
+    <script src="https://tg.pday.online/includes/webappscripts_6.js"></script>
     <script>
         // Convert session values into actual booleans
         const telegramId = "<?php echo $_SESSION['telegram_id']; ?>";
@@ -697,6 +696,36 @@ function createUsersTable(PDO $db)
             // Set the clicked button as active
             document.getElementById(buttonId).classList.remove('inactive');
         }
+
+        // Function to update content based on language
+        function updateContent(isChinese) {
+            const mainHeading = document.getElementById('mainHeading');
+            const linkedInFollowBtn = document.getElementById('linkedInFollowBtn');
+            const linkedInLikeBtn = document.getElementById('linkedInLikeBtn');
+            const twitterFoollowBtn = document.getElementById('twitterFoollowBtn');
+            const twitterRetweetBtn = document.getElementById('twitterRetweetBtn');
+            const connectWalletBtn = document.getElementById('connectWalletBtn');
+
+            if (isChinese) {
+                mainHeading.textContent = "PayDay 代币分发！";
+                linkedInFollowBtn.textContent = "在 LinkedIn 上关注 200,000 $PDAY";
+                linkedInLikeBtn.textContent = "加入我们的社区 200,000 $PDAY";
+                twitterFoollowBtn.textContent = "在 Twitter 上关注我们 200,000 $PDAY";
+                twitterRetweetBtn.textContent = "点赞并转发我们的 Twitter 帖子 200,000 $PDAY";
+                connectWalletBtn.textContent = "连接 TON 钱包 200,000 $PDAY"; 
+            } else {
+                mainHeading.textContent = "PayDay Token Distribution!";
+                linkedInFollowBtn.textContent = "Follow on LinkedIn 200,000 $PDAY";
+                linkedInLikeBtn.textContent = "Join our Community 200,000 $PDAY";
+                twitterFoollowBtn.textContent = "Follow us on Twitter 200,000 $PDAY";
+                twitterRetweetBtn.textContent = "Like and Retweet our Twitter Post 200,000 $PDAY";
+                connectWalletBtn.textContent = "Connect TON Wallet 200,000 $PDAY"; 
+            }
+        }
+
+        // Get browser language
+        const userLang = navigator.language || navigator.userLanguage;
+        const isChinese = userLang.startsWith('zh');
 
         // Add event listeners for each button
         document.getElementById('homeBtn').addEventListener('click', function () {

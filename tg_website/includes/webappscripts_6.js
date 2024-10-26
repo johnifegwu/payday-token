@@ -35,7 +35,12 @@ function checkTaskCompletion(taskName, currentButton, nextButton, taskStatus, ur
 
             // Create a "Checking..." message with a spinner and append to taskStatus
             var checkingDisplay = document.createElement('span');
-            checkingDisplay.innerHTML = 'Checking... <div class="spinner"></div>';
+            // Determine if the user's language is Chinese
+            if (navigator.language.startsWith('zh') || navigator.languages.some(lang => lang.startsWith('zh'))) {
+                checkingDisplay.innerHTML = '正在檢查... <div class="spinner"></div>'; // Chinese text
+            } else {
+                checkingDisplay.innerHTML = 'Checking... <div class="spinner"></div>';
+            }
             taskStatus.appendChild(checkingDisplay);
 
             // Create an XMLHttpRequest object

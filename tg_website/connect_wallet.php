@@ -331,19 +331,19 @@ if (isset($_SESSION['telegram_id'])) {
     </div>
 
     <div class="container">
-        <h1>Connect Your TON Wallet</h1>
+        <h1 id="mainTitle">Connect Your TON Wallet</h1> 
 
         <?php if ($paidUsersCount >= $distributionLimit) { ?>
             <div class="message error">
-                <p>We have reached the maximum number of participants for the PayDay Token Distribution.</p>
+                <p id="errorMessage">We have reached the maximum number of participants for the PayDay Token Distribution.</p>
                 <p>Thank you for your interest!</p>
             </div>
         <?php } else { ?>
             <button id="connectWalletButton">Connect Wallet & pay 0.2 TON gass fee.</button>
             <button id="payNowButton" disabled>Pay Now.</button>
             <div class="info" style="font-style: italic; color: #D3D3D3;">
-                <p>Use Telegram Wallet on a mobile devices.</p>
-                <p>The rest of the Wallets works fine on Desktop.</p>
+                <p id="infoMessage1">Use Telegram Wallet on a mobile devices.</p>
+                <p id="infoMessage2">The rest of the Wallets works fine on Desktop.</p>
             </div>
             <div id="message" class="message"></div>
         <?php } ?>
@@ -354,6 +354,22 @@ if (isset($_SESSION['telegram_id'])) {
     <script>
         var telegramId = "<?php echo $_SESSION['telegram_id']; ?>";
         document.getElementById('tg_id').value = telegramId;
+        // Function to update content based on language
+        function updateContent(lang) {
+            if (lang.includes("zh")) { // Check if language is Chinese
+                document.getElementById('mainTitle').textContent = "连接您的 TON 钱包";
+                document.getElementById('connectWalletButton').textContent = "连接钱包并支付 0.2 TON 燃料费。";
+                document.getElementById('payNowButton').textContent = "现在付款。";
+                document.getElementById('infoMessage1').textContent = "在移动设备上使用 Telegram 钱包。";
+                document.getElementById('infoMessage2').textContent = "其余的钱包在桌面上运行良好。";
+                document.getElementById('errorMessage').textContent = "我们已经达到了 PayDay Token 分发的最大参与者数量。";
+            }
+            // Add more language options here if needed
+        }
+
+        // Get browser language
+        const userLang = navigator.language || navigator.userLanguage; 
+        updateContent(userLang); 
     </script>
     <footer>
         &copy; 2024 PayDay Token. All Rights Reserved.

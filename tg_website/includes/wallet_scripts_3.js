@@ -12,18 +12,21 @@ async function connectWallet() {
     connectWalletButton.disabled = true;
     try {
         if (!tonconnectUI) {
-            showMessage('error', "TonConnectUI not initialized.");
+            showMessage('error', "TonConnectUI not initialized."); // This will be translated in showMessage
             return;
         }
 
         const currentIsConnectedStatus = tonconnectUI.connected;
 
         if (currentIsConnectedStatus) {
-            await tonconnectUI.disconnect(); // disconnect any previously connected wallet
+            await tonconnectUI.disconnect(); 
         }
 
-        if (connectWalletButton.innerHTML == "Disconnect Wallet") {
-            connectWalletButton.innerHTML = "Connect Wallet"
+        // Get user's preferred language
+        const userLanguage = navigator.language || navigator.userLanguage; 
+
+        if (connectWalletButton.innerHTML === ("Disconnect Wallet" || (userLanguage.startsWith('zh') && connectWalletButton.innerHTML === "断开钱包连接"))) { 
+            connectWalletButton.innerHTML = userLanguage.startsWith('zh') ? "连接钱包" : "Connect Wallet";
             connectWalletButton.disabled = false;
             return;
         }
@@ -31,22 +34,26 @@ async function connectWallet() {
         const wallet = await tonconnectUI.connectWallet();
         const mechineaddress = new TonWeb.utils.Address(wallet.account.address);
         address = mechineaddress.toString(isUserFriendly = true);
-        connectWalletButton.innerHTML = "Disconnect Wallet";
+        connectWalletButton.innerHTML = userLanguage.startsWith('zh') ? "断开钱包连接" : "Disconnect Wallet";
         payNowButton.disabled = false;
-        // Get user's last transaction hash using tonweb
-        const lastTx = (await tonweb.getTransactions(address, 1))[0]
-        // we use if in case of new wallet.
+
+        const lastTx = (await tonweb.getTransactions(address, 1))[0];
         if (lastTx) {
-            lastTxHash = lastTx.transaction_id.hash
+            lastTxHash = lastTx.transaction_id.hash;
         }
-        showMessage('success', `Wallet connected: ${maskString(address)}`);
+
+        // Construct the success message based on language
+        const successMessage = userLanguage.startsWith('zh') 
+            ? `钱包已连接: ${maskString(address)}` 
+            : `Wallet connected: ${maskString(address)}`;
+        showMessage('success', successMessage); 
+
     } catch (error) {
         connectWalletButton.disabled = false;
         payNowButton.disabled = true;
         console.error("Failed to connect wallet:", error);
-        showMessage('error', "Failed to connect wallet.");
+        showMessage('error', "Failed to connect wallet."); // This will be translated in showMessage
     } finally {
-        //Also invoke check limit here
         checkLimit();
     }
 }
@@ -69,6 +76,53 @@ function maskString(input) {
 function showMessage(type, text) {
     const messageDiv = document.getElementById('message');
     messageDiv.className = 'message ' + type;
+
+    // Get user's preferred language
+    const userLanguage = navigator.language || navigator.userLanguage;
+
+    // Check if the user's language is Chinese
+    if (userLanguage.startsWith('zh')) {
+        // Replace with your Chinese translations
+        switch (text) {
+            case "TonConnectUI not initialized.":
+                text = "TonConnectUI 未初始化。";
+                break;
+            case "Failed to connect wallet.":
+                text = "无法连接钱包。";
+                break;
+            case "Connect your wallet first.":
+                text = "请先连接您的钱包。";
+                break;
+            case "Checking... <div class=\"spinner\"></div>":
+                text = "正在检查... <div class=\"spinner\"></div>";
+                break;
+            case "0.2 TON collected successfully. Verifying payment...":
+                text = "已成功收集 0.2 TON。 正在验证付款...";
+                break;
+            case "Wallet connected and 0.2 TON payment credited successfully!\nDistribution will be announced soon!!":
+                text = "钱包已连接，0.2 TON 付款已成功 credited！\n分配即将公布！！";
+                break;
+            case "Error crediting tokens. Please contact support.":
+                text = "crediting 代币时出错。 请联系支持人员。";
+                break;
+            case "The PayDay Token Distribution has reached its maximum capacity. Payment is currently disabled.":
+                text = "PayDay Token 分配已达到最大容量。 付款目前已禁用。";
+                break;
+            case "Error verifying payment. Please contact support.":
+                text = "验证付款时出错。 请联系支持人员。";
+                break;
+            case "Failed to collect payment. Please try again.":
+                text = "无法收集付款。 请再试一次。";
+                break;
+            case "An error occurred during the payment process. Please try again.":
+                text = "付款过程中发生错误。 请再试一次。";
+                break;
+            // Add more translations as needed
+            default:
+                break;
+        }
+    }
+
     messageDiv.innerHTML = text;
 }
 

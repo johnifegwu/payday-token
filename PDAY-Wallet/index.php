@@ -117,4 +117,3 @@ function servePresalePage() {
     header('Content-type: text/html');
     readfile("wallet.html");
 }
-?>

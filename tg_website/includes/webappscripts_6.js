@@ -8,8 +8,8 @@ const linkedInFollowBtntatus = document.getElementById("linkedInFollowBtnStatus"
 const taskStatus = document.getElementById("taskStatus");
 const linkedInPageUrl = "https://www.linkedin.com/company/payday-token/about/?viewAsMember=true";
 const linkedInPostUrl = "https://t.me/tokenpayday";
-const tqitterProfileUrl = "https://x.com/token_payday";
-const twitterPostUrl = "https://x.com/token_payday/status/1850043504409395284";
+const tqitterProfileUrl = "https://x.com/PDAY_Token";
+const twitterPostUrl = "https://x.com/PDAY_Token/status/1851276856391000459";
 
 function checkTaskCompletion(taskName, currentButton, nextButton, taskStatus, url) {
     // taskStatus is now a normal DOM element

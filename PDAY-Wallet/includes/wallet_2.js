@@ -401,9 +401,14 @@ function showCreateOrImportKeyOverlay() {
     document.getElementById('authenticationOverlay').style.display = 'none'; // Hide authentication overlay
 }
 
+function showAuthenticationOverlay() {
+    document.getElementById('createOrImportKeyOverlay').style.display = 'none'; // Hide create key overlay
+    document.getElementById('authenticationOverlay').style.display = 'flex';
+}
+
 // Display the authentication overlay on page load
 window.onload = function () {
-    document.getElementById('authenticationOverlay').style.display = 'flex';
+    showAuthenticationOverlay();
     // Call loadTransactionHistory on page load to populate history tab
     loadTransactionHistory();
 };

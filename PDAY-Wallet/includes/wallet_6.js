@@ -1,5 +1,7 @@
 //const TonWeb = window.TonWeb;
-const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: decodeSiteKey()}));
+//const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: decodeSiteKey()}));
+
+const tonweb = window.TonWeb;
 
 const PDAY_CONTRACT_ADDRESS = "EQBGGZp3hbLIzr3GmM37mT-7tjP1lCgrBEzSa7AYCxPAFPHW";
 const MAX_LINES = 10;

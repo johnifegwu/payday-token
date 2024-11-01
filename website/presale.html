@@ -12,7 +12,6 @@
             background-color: #1a1a1a;
             color: #d4af37;
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -21,74 +20,14 @@
             overflow-x: hidden;
         }
 
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 600px;
-            min-height: 100vh;
-            /* Ensure the content fills the height of the screen */
-        }
-
         .container {
             background-color: #262626;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
             width: 90%;
             max-width: 600px;
-            text-align: center;
-        }
-
-        .links {
-            margin-top: 35px;
-            font-size: 14px;
-            text-align: center;
-            padding-bottom: 20px;
-        }
-
-
-        h1 {
-            color: #ffcc00;
-            margin-bottom: 20px;
-        }
-
-        p {
-            color: #d4af37;
-        }
-
-        button {
-            background-color: #ffcc00;
-            color: #1a1a1a;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 0;
-            width: 100%;
-            max-width: 250px;
-        }
-
-        button:hover {
-            background-color: #ffd700;
-        }
-
-        .info {
-            margin: 20px 0;
-        }
-
-        .input-container {
-            margin: 20px 0;
-        }
-
-        input {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            width: 80%;
-            max-width: 200px;
         }
 
         .logo {
@@ -107,11 +46,80 @@
             /* Optional: center text if needed */
         }
 
+        h1 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
 
-        /* img {
-            max-width: 100%;
-            max-height: 100%;
-        } */
+        .highlight {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+
+        .info, .links {
+            margin: 20px 0;
+        }
+
+        .hidden-text {
+            display: none;
+        }
+
+        button {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 15px 0;
+            width: 80%;
+            max-width: 300px;
+            font-size: 1.1em;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #ffd700;
+            transform: scale(1.05);
+        }
+
+        .countdown, #statusContainer {
+            color: #d4af37;
+            font-size: 1.2em;
+            margin-top: 15px;
+            padding: 10px 0;
+        }
+
+        .progress {
+            width: 80%;
+            height: 30px;
+            background-color: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px auto;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #d4af37;
+            width: 60%;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s;
+        }
+
+        .exchanges-section {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #262626;
+            border-radius: 10px;
+        }
+
+        .exchanges-section h2, .countdown, .highlight {
+            color: #ffcc00;
+        }
 
         .links a {
             color: #ffcc00;
@@ -123,142 +131,18 @@
             text-decoration: underline;
         }
 
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #d4af37;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-left: 10px;
+        @keyframes blink {
+            50% { opacity: 0.5; }
         }
 
-        .exchanges-section {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #262626;
-            border-radius: 10px;
-            text-align: center;
-            width: 100%;
-            max-width: 800px;
-            box-sizing: border-box;
-        }
-
-        .exchanges-section h2 {
-            color: #ffcc00;
-            margin-bottom: 20px;
-        }
-
-        .exchange-list {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-
-        .exchange-item {
-            margin: 10px;
-            text-align: center;
-        }
-
-        .exchange-item a {
-            color: #d4af37;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .exchange-item a:hover {
-            text-decoration: underline;
-        }
-
-        .exchange-logo {
-            max-width: 100px;
-            height: auto;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .hidden-text {
-            display: none;
-        }
-        #statusContainer {
-            width: 100%;
-            background-color: rgba(38, 38, 38, 0.8);
-            /* Semi-transparent background */
-            border-radius: 5px;
-            border: 1px solid gold;
-            overflow: hidden;
-            padding: 5px 0;
-            /* Optional: Add a little padding around the status bar */
-            margin: 10px 0;
-        }
-
-        #statusBar {
-            height: 30px;
-            width: 0%;
-            /* Initially 0% width */
-            background-color: #d4af37;
-            /* Original theme color */
-            text-align: center;
-            color: white;
-            line-height: 30px;
-            /* Center text vertically */
-            transition: width 0.5s;
-        }
-
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Media Queries for Responsiveness */
-        @media (min-width: 768px) {
-            body {
-                flex-direction: row;
-                padding: 40px;
-            }
-
-            .container {
-                padding: 40px;
-            }
-
-            button {
-                width: auto;
-            }
+        .countdown span {
+            animation: blink 1s infinite;
         }
 
         @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8em;
-            }
-
-            p {
-                font-size: 1em;
-            }
-
-            button {
-                font-size: 1em;
-            }
-
-            .links a {
-                font-size: 12px;
-            }
-
-            #statusBar {
-                height: 25px;
-                /* Slightly reduce height for mobile */
-                margin: 0 10px;
-                /* Reduce margins on mobile for better fit */
-                line-height: 25px;
-                /* Center text vertically */
-            }
+            h1 { font-size: 1.8em; }
+            button { font-size: 1em; }
+            .countdown { font-size: 1em; }
         }
     </style>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" defer></script>
@@ -268,73 +152,95 @@
 </head>
 
 <body>
-
     <div class="container">
         <div class="logo">
-          <img src="imgs/payday.png" alt="PayDay Token Logo" width="100%" height="100%">
+            <img src="imgs/payday.png" alt="PayDay Token Logo" width="100%" height="100%">
         </div>
-        <h1 id="mainHeading">PayDay Token Presale</h1>
-        <p id="presalePrice">Presale Price: <strong>$0.0006 per PDAY</strong></p>
-        <p id="listingPrice">Expected Listing Price: <strong>$0.001 per PDAY</strong></p>
-        <p id="minTON">Minimum TON Required: <strong>0.7 TON</strong></p>
-    
-        <div class="input-container">
-          <input type="number" id="tonInput" min="0.7" max="5000" placeholder="Enter TON amount" />
+        <h1>PayDay Token Presale</h1>
+        <div class="countdown">Limited Supply - Ends in <span id="timer"></span></div>
+        <p>Presale Price: <span class="highlight">$0.0006 per PDAY</span></p>
+        <p>Expected Listing Price: <span class="highlight">$0.001 per PDAY</span></p>
+
+        <div class="info">
+            <input type="number" id="tonInput" min="0.7" max="5000" placeholder="Enter TON amount" style="padding: 10px; border-radius: 5px; width: 70%;">
         </div>
         <div class="info" id="walletStatus"></div>
         <div class="info" id="transferStatus"></div>
         <button id="buyNowButton" disabled>Buy Now</button>
         <button id="connectWalletButton">Connect Wallet</button>
-        <p id="tokensBought">PDAY Tokens Bought (1st Round)</p>
-        <div id="statusContainer">
-          <div id="statusBar">$0.00</div>
-        </div>
         <div class="info" style="font-style: italic; color: #D3D3D3;">
-          <p id="telegramInfo">Use Telegram Wallet on mobile devices.</p>
-          <p id="walletInfo">The rest of the Wallets works fine on Desktop.</p>
+            <p id="telegramInfo">Use Telegram Wallet on mobile devices.</p>
+            <p id="walletInfo">The rest of the Wallets works fine on Desktop.</p>
         </div>
-        <script src="https://pday.online/includes/secret.js"></script>
-        <script src="https://pday.online/dist/tonweb.js"></script>
-        <script src="https://pday.online/includes/454478225887_12.js"></script>
+        <p>Tokens Sold: <span class="highlight" id="tokensSold">0</span></p>
+        <div class="progress" id="statusContainer">
+            <div class="progress-bar" id="statusBar">60% Sold</div>
+        </div>
+
+        <div class="info">
+            <p>Connect with us on Telegram for Airdrops and Updates!</p>
+            <a href="https://t.me/paydaytokenbot?start=ar1926451270" class="highlight">Join Telegram</a>
+        </div>
+
         <div class="exchanges-section">
-          <h2 id="exchangesHeading">Available on Exchanges</h2>
-          <div class="exchange-list">
+            <h2>Available on Exchanges</h2>
             <div class="exchange-item">
-              <a href="https://blockspot.io/coin/payday-2/" target="_blank">
-                <img src="imgs/blockspot.png" alt="Blockspot" class="exchange-logo">
-                <span></span>
-              </a>
-            </div>
+                <a href="https://blockspot.io/coin/payday-2/" target="_blank">
+                    <img src="imgs/blockspot.png" alt="Blockspot" class="exchange-logo" style="max-width: 100px;">
+                </a>
             </div>
         </div>
         <div class="links">
-            <a href="https://pday.online/whitepaper.pdf" target="_blank">Whitepaper <span class="hidden-text">New 1000 x crypto</span></a> |
-            <a href="https://x.com/PDAY_Token" target="_blank">Twitter <span class="hidden-text">Free Crypto Airdrop</span></a> |
-            <a href="https://www.linkedin.com/company/payday-token/?viewAsMember=true" target="_blank">LinkedIn <span class="hidden-text">New 1000 x crypto</span></a> |
-            <a href="https://t.me/paydaytokenbot?start=ar1926451270" target="_blank">Telegram <span class="hidden-text">Crypto Airdrop</span></a>
-          </div>
-      </div>
-    
-      <script>
-    
+            <a href="https://pday.online/whitepaper.pdf" target="_blank">Whitepaper <span class="hidden-text">New 1000 x
+                    crypto</span></a> |
+            <a href="https://x.com/PDAY_Token" target="_blank">Twitter <span class="hidden-text">Free Crypto
+                    Airdrop</span></a> |
+            <a href="https://www.linkedin.com/company/payday-token/?viewAsMember=true" target="_blank">LinkedIn <span
+                    class="hidden-text">New 1000 x crypto</span></a> |
+            <a href="https://t.me/paydaytokenbot?start=ar1926451270" target="_blank">Telegram <span
+                    class="hidden-text">Crypto Airdrop</span></a>
+        </div>
+        <!-- <div class="links">
+            <a href="https://pday.online/whitepaper.pdf" target="_blank">Whitepaper</a> |
+            <a href="https://x.com/PDAY_Token" target="_blank">Twitter</a> |
+            <a href="https://www.linkedin.com/company/payday-token/" target="_blank">LinkedIn</a> |
+            <a href="https://t.me/paydaytokenbot?start=ar1926451270" target="_blank">Telegram</a>
+        </div> -->
+    </div>
+    <script src="https://pday.online/includes/secret.js"></script>
+    <script src="https://pday.online/dist/tonweb.js"></script>
+    <script src="https://pday.online/includes/454478225887_15.js"></script>
+    <script>
+        // Countdown timer
+        // Set the launch time to 17th November 2024, 08:00 UTC
+        let endTime = new Date(Date.UTC(2024, 10, 18, 8, 0, 0)).getTime(); // Note: Month is 0-indexed, so 10 = November
+        const timerElement = document.getElementById("timer");
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+            if (distance < 0) {
+                timerElement.innerHTML = "1st Round  Ended, 2nd Round starts by Nov. 24th";
+                return;
+            }
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            timerElement.innerHTML = `${days}d ${hours}h ${minutes}m`;
+        }
+
         function updateContent() {
           const browserLanguage = getBrowserLanguage();
           if (browserLanguage.startsWith('zh')) { 
-            document.getElementById('mainHeading').textContent = "PayDay 代币预售";
-            document.getElementById('presalePrice').textContent = "预售价格：每 PDAY 0.0006 美元";
-            document.getElementById('listingPrice').textContent = "预计上市价格：每 PDAY 0.001 美元";
-            document.getElementById('minTON').textContent = "最低 TON 要求：0.7 TON";
             document.getElementById('buyNowButton').textContent = "立即购买";
             document.getElementById('connectWalletButton').textContent = "连接钱包";
-            document.getElementById('tokensBought').textContent = "已购买的 PDAY 代币（第一轮）";
             document.getElementById('telegramInfo').textContent = "在移动设备上使用 Telegram 钱包。";
             document.getElementById('walletInfo').textContent = "其余的钱包在桌面上运行良好。";
-            document.getElementById('exchangesHeading').textContent = "可在交易所购买";
           }
         }
-    
+        setInterval(updateCountdown, 1000);
         updateContent(); 
-      </script>
+    </script>
 </body>
 
 </html>

@@ -262,28 +262,27 @@ function fetchTotalPayDayBought(siteKey) {
                 alert(data.error); // Alert the error
             } else {
                 let totalPayDayBought = parseFloat(data.totalPayDayBought) || 0;
-                if(totalPayDayBought < 1047592){
-                    totalPayDayBought += 1047592;
+                if(totalPayDayBought < 10047592){
+                    totalPayDayBought += 10047592;
                 }
-                let cappedLimit = 10_000_000;
+                let cappedLimit = 10047592;
                 const maxX = 10_000_000_000; // 10 billion per round
-                if (totalPayDayBought >= 0.7 * cappedLimit) {
+                if (totalPayDayBought >= cappedLimit) {
                     cappedLimit = Math.min(totalPayDayBought + 10_000_000, maxX);
                 }
+                const tokensSold = document.getElementById("tokensSold");
                 const statusBar = document.getElementById("statusBar");
                 const progressPercentage = (totalPayDayBought / cappedLimit) * 100;
 
                 // Update status bar
-                statusBar.style.width = progressPercentage + "%";
-                statusBar.textContent = `$${totalPayDayBought.toFixed(2)}`;
+                tokensSold.textContent = `${totalPayDayBought.toFixed(2)}`;
+                statusBar.style.width = progressPercentage.toFixed(2) + "%";
+                statusBar.textContent = progressPercentage.toFixed(2) + "% Sold";
 
                 if (totalPayDayBought >= cappedLimit) {
                     statusBar.textContent = "Sale limit reached!";
                     statusBar.style.backgroundColor = "red"; // Change color to indicate limit reached
                     console.log("Color changed to red.");
-                } else {
-                    statusBar.style.backgroundColor = "#d4af37"; // Normal color
-                    console.log("Color changed to solid gold.");
                 }
 
                 console.log("Total PayDayTokens Bought on this site:", totalPayDayBought);

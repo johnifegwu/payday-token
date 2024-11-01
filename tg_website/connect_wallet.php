@@ -356,10 +356,6 @@ if (isset($_SESSION['telegram_id'])) {
         <?php } else { ?>
             <button id="connectWalletButton">Connect Wallet & pay 0.2 TON gass fee.</button>
             <button id="payNowButton" disabled>Pay Now.</button>
-            <div class="info" style="font-style: italic; color: #D3D3D3;">
-                <p id="infoMessage1">Use Telegram Wallet on a mobile devices.</p>
-                <p id="infoMessage2">The rest of the Wallets works fine on Desktop.</p>
-            </div>
             <div id="message" class="message"></div>
         <?php } ?>
     </div>

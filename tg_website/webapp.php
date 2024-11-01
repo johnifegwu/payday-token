@@ -370,6 +370,16 @@ function createUsersTable(PDO $db)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PayDay Token</title>
     <link rel="icon" href="https://tg.pday.online/imgs/paydayicon.png" type="image/png">
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-T77NH9G2');</script>
+    <!-- End Google Tag Manager -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -623,12 +633,17 @@ function createUsersTable(PDO $db)
 </head>
 
 <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T77NH9G2" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <div class="header">
         <img src="imgs/PayDay_banner.png" alt="PayDay Token Logo" class="logo">
     </div>
     <div class="container">
         <h1 id="mainHeading">PayDay Token Distribution!</h1>
-        <div id="telegram-id" style="display: flex; justify-content: space-between; align-items: center; color: #ffcc00; margin-bottom: 5px; margin-left: 40px; margin-right: 20px;">
+        <div id="telegram-id"
+            style="display: flex; justify-content: space-between; align-items: center; color: #ffcc00; margin-bottom: 5px; margin-left: 40px; margin-right: 20px;">
             <div style="text-align: left;">
                 <span id="telegramIdDisplay"></span>
             </div>
@@ -712,14 +727,14 @@ function createUsersTable(PDO $db)
                 linkedInLikeBtn.textContent = "加入我们的社区 200,000 $PDAY";
                 twitterFoollowBtn.textContent = "在 Twitter 上关注我们 200,000 $PDAY";
                 twitterRetweetBtn.textContent = "点赞并转发我们的 Twitter 帖子 200,000 $PDAY";
-                connectWalletBtn.textContent = "连接 TON 钱包 200,000 $PDAY"; 
+                connectWalletBtn.textContent = "连接 TON 钱包 200,000 $PDAY";
             } else {
                 mainHeading.textContent = "PayDay Token Distribution!";
                 linkedInFollowBtn.textContent = "Follow on LinkedIn 200,000 $PDAY";
                 linkedInLikeBtn.textContent = "Join our Community 200,000 $PDAY";
                 twitterFoollowBtn.textContent = "Follow us on Twitter 200,000 $PDAY";
                 twitterRetweetBtn.textContent = "Like and Retweet our Twitter Post 200,000 $PDAY";
-                connectWalletBtn.textContent = "Connect TON Wallet 200,000 $PDAY"; 
+                connectWalletBtn.textContent = "Connect TON Wallet 200,000 $PDAY";
             }
         }
 

@@ -143,26 +143,42 @@ function servePresalePage()
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PayDay Token</title>
     <link rel="icon" href="https://tg.pday.online/imgs/paydayicon.png" type="image/png">
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-T77NH9G2');</script>
+    <!-- End Google Tag Manager -->
     <style>
-         /* Style for the DIV with background and new spinner */
-         #loadingDiv {
+        /* Style for the DIV with background and new spinner */
+        #loadingDiv {
             position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%); /* Center horizontally */
-    min-width: 439px; /* Minimum width */
-    width: auto; /* Auto width */
-    height: calc(100vh - 20px); /* Full height minus top and bottom margins */
-    background-image: url('imgs/payday_poster.png'); /* Replace with the correct path */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    padding: 20px; /* Optional: padding around the content */
-}
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            /* Center horizontally */
+            min-width: 439px;
+            /* Minimum width */
+            width: auto;
+            /* Auto width */
+            height: calc(100vh - 20px);
+            /* Full height minus top and bottom margins */
+            background-image: url('imgs/payday_poster.png');
+            /* Replace with the correct path */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 20px;
+            /* Optional: padding around the content */
+        }
 
         /* Style for the new red spinner */
         .loading-spinner {
@@ -177,8 +193,13 @@ function servePresalePage()
 
         /* Keyframes for the spinner animation */
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Hide the loading div after content loads */
@@ -190,8 +211,10 @@ function servePresalePage()
         @media (max-width: 768px) {
             #loadingDiv {
                 background-size: contain;
-                align-items: center; /* Center the spinner vertically for smaller screens */
+                align-items: center;
+                /* Center the spinner vertically for smaller screens */
             }
+
             .loading-spinner {
                 width: 30px;
                 height: 30px;
@@ -200,13 +223,18 @@ function servePresalePage()
         }
     </style>
 </head>
+
 <body>
-<div id="loadingDiv">
-    <div class="loading-spinner"></div>
-</div>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T77NH9G2" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="loadingDiv">
+        <div class="loading-spinner"></div>
+    </div>
     <script>
-       // Delay execution by 10 seconds
-       setTimeout(function () {
+        // Delay execution by 10 seconds
+        setTimeout(function () {
             // Get the full URL including the fragment (hash)
             var fullUrl = window.location.href;
 

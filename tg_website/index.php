@@ -289,6 +289,29 @@ function servePresalePage()
             }
         }, 10000); // 10000 milliseconds = 10 seconds
     </script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8O5RdqYjMZIEwWmkxiA-2iXJz_fJdaxI",
+            authDomain: "tg-web-app---payday.firebaseapp.com",
+            projectId: "tg-web-app---payday",
+            storageBucket: "tg-web-app---payday.firebasestorage.app",
+            messagingSenderId: "859490855411",
+            appId: "1:859490855411:web:3b045f7a168b6092cdca86",
+            measurementId: "G-EK8TXKC2TR"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
 </body>
 
 </html>

@@ -764,7 +764,6 @@ function createUsersTable(PDO $db)
         <button id="inviteBtn" class="inactive"><i class="fas fa-share"></i><br>Invite</button>
         <button id="presaleBtn" class="inactive"><i class="fas fa-money-bill-alt"></i><br>Profile</button>
     </div>
-
 </body>
 
 </html>

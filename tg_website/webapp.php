@@ -218,11 +218,11 @@ function calculateEarnings(array $user, array &$actions): int
         // Calculate based on LinkedIn actions
         if ($user['linkedin_followed']) {
             $actions['enableLinkedInFollow'] = false;
-            $total = 200000;
+            $total = 20000;
         }
         if ($user['linkedin_liked']) {
             $actions['enableLinkedInRepost'] = false;
-            $total += 200000;
+            $total += 20000;
         } else {
             if (!$actions['enableLinkedInFollow']) {
                 $actions['enableLinkedInRepost'] = true;
@@ -232,7 +232,7 @@ function calculateEarnings(array $user, array &$actions): int
         // Calculate based on Twitter actions
         if ($user['twitter_followed']) {
             $actions['enableTwitterFollow'] = false;
-            $total += 200000;
+            $total += 20000;
         } else {
             if (!$actions['enableLinkedInRepost']) {
                 $actions['enableTwitterFollow'] = true;
@@ -241,7 +241,7 @@ function calculateEarnings(array $user, array &$actions): int
 
         if ($user['twitter_retweeted']) {
             $actions['enableTwitterRepost'] = false;
-            $total += 200000;
+            $total += 20000;
         } else {
             if (!$actions['enableTwitterFollow']) {
                 $actions['enableTwitterRepost'] = true;
@@ -249,9 +249,9 @@ function calculateEarnings(array $user, array &$actions): int
         }
 
         // Wallet connection
-        if ($user['wallet_connected'] && $user["tokens"] >= 1000000) {
+        if ($user['wallet_connected'] && $user["tokens"] >= 100000) {
             $actions['walletConnected'] = false;
-            $total += 200000;
+            $total += 20000;
         } else {
             if (!$actions['enableTwitterRepost']) {
                 $actions['walletConnected'] = true;
@@ -274,7 +274,7 @@ function calculateEarnings(array $user, array &$actions): int
 
     $_SESSION['first_name'] = $user['first_name'] ? $user['first_name'] : '';
     // Limit total earnings
-    return min($total, 1000000);
+    return min($total, 100000);
 }
 
 /**
@@ -284,7 +284,7 @@ function sendTelegramMessage(string $website, string $chat_instance, string $fir
 {
     $reply = "Hey $firstName,\n\n";
     $reply .= "Welcome to the PayDay Token Distribution!\n\n";
-    $reply .= "Click the PLAY button above to receive your 1,000,000 PDAY Tokens!\n\n";
+    $reply .= "Click the PLAY button above to receive your 100,000 PDAY Tokens!\n\n";
     $reply .= "Hurry, there's a limited distribution of PDAY Tokens.\n\n";
     $reply .= "Follow us on LinkedIn to stay updated.";
 
@@ -652,11 +652,11 @@ function createUsersTable(PDO $db)
         <p style="font-size: 30px; color: #ffcc00; font-weight: 500;">
             $PDAY <span id="token-count">0</span>
         </p>
-        <button id="linkedInFollowBtn">Follow on LinkedIn 200,000 $PDAY</button>
-        <button id="linkedInLikeBtn" disabled>Join our Community 200,000 $PDAY</button>
-        <button id="twitterFoollowBtn" disabled>Follow us on Twitter 200,000 $PDAY</button>
-        <button id="twitterRetweetBtn" disabled>Like and Retweet our Twitter Post 200,000 $PDAY</button>
-        <button id="connectWalletBtn" disabled>Connect TON Wallet 200,000 $PDAY</button>
+        <button id="linkedInFollowBtn">Follow on LinkedIn 20,000 $PDAY</button>
+        <button id="linkedInLikeBtn" disabled>Join our Community 20,000 $PDAY</button>
+        <button id="twitterFoollowBtn" disabled>Follow us on Twitter 20,000 $PDAY</button>
+        <button id="twitterRetweetBtn" disabled>Like and Retweet our Twitter Post 20,000 $PDAY</button>
+        <button id="connectWalletBtn" disabled>Connect TON Wallet 20,000 $PDAY</button>
         <input type="hidden" id="tg_id" name="tg_id">
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -723,18 +723,18 @@ function createUsersTable(PDO $db)
 
             if (isChinese) {
                 mainHeading.textContent = "PayDay 代币分发！";
-                linkedInFollowBtn.textContent = "在 LinkedIn 上关注 200,000 $PDAY";
-                linkedInLikeBtn.textContent = "加入我们的社区 200,000 $PDAY";
-                twitterFoollowBtn.textContent = "在 Twitter 上关注我们 200,000 $PDAY";
-                twitterRetweetBtn.textContent = "点赞并转发我们的 Twitter 帖子 200,000 $PDAY";
-                connectWalletBtn.textContent = "连接 TON 钱包 200,000 $PDAY";
+                linkedInFollowBtn.textContent = "在 LinkedIn 上关注 20,000 $PDAY";
+                linkedInLikeBtn.textContent = "加入我们的社区 20,000 $PDAY";
+                twitterFoollowBtn.textContent = "在 Twitter 上关注我们 20,000 $PDAY";
+                twitterRetweetBtn.textContent = "点赞并转发我们的 Twitter 帖子 20,000 $PDAY";
+                connectWalletBtn.textContent = "连接 TON 钱包 20,000 $PDAY";
             } else {
                 mainHeading.textContent = "PayDay Token Distribution!";
-                linkedInFollowBtn.textContent = "Follow on LinkedIn 200,000 $PDAY";
-                linkedInLikeBtn.textContent = "Join our Community 200,000 $PDAY";
-                twitterFoollowBtn.textContent = "Follow us on Twitter 200,000 $PDAY";
-                twitterRetweetBtn.textContent = "Like and Retweet our Twitter Post 200,000 $PDAY";
-                connectWalletBtn.textContent = "Connect TON Wallet 200,000 $PDAY";
+                linkedInFollowBtn.textContent = "Follow on LinkedIn 20,000 $PDAY";
+                linkedInLikeBtn.textContent = "Join our Community 20,000 $PDAY";
+                twitterFoollowBtn.textContent = "Follow us on Twitter 20,000 $PDAY";
+                twitterRetweetBtn.textContent = "Like and Retweet our Twitter Post 20,000 $PDAY";
+                connectWalletBtn.textContent = "Connect TON Wallet 20,000 $PDAY";
             }
         }
 

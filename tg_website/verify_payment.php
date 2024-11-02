@@ -18,7 +18,7 @@ $PASSWORD = $config['db_password'];
 $DBNAME = $config['db_name'];
 $PAYDAY_TOKEN_WALLET = "UQBHTgwIOT5lb3XnylLWWdKRn4ilCgufkw-sZw21yv4WUpK2";
 $TON_API_KEY = $config['ton_api_key'];
-$PAYMENT_LIMIT = 70000;
+$PAYMENT_LIMIT = 600000;
 $REQUIRED_AMOUNT = 0.2;
 $TON_DIVISOR = 1000000000;
 

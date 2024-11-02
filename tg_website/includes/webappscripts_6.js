@@ -57,7 +57,7 @@ function checkTaskCompletion(taskName, currentButton, nextButton, taskStatus, ur
                         var numstr = tokenCountElement.textContent.replace(/,/g, "");
                         var tokens = parseInt(numstr, 10); // Ensure the token count is an integer
                         if (tasks[taskName]) {
-                            tokens += 200000; // Add tokens if the task is completed
+                            tokens += 20000; // Add tokens if the task is completed
                             tokenCountElement.textContent = tokens.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                             // Update task completion display
@@ -119,7 +119,7 @@ function checkTaskCompletion(taskName, currentButton, nextButton, taskStatus, ur
 //                         // Update token count
 //                         let tokens = parseInt($('#token-count').text(), 10); // Ensure the token count is an integer
 //                         if (tasks[taskName]) {
-//                             tokens += 200000; // Add tokens if the task is completed
+//                             tokens += 20000; // Add tokens if the task is completed
 //                         }
 //                         $('#token-count').text(tokens);
 

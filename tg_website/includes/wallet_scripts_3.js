@@ -197,7 +197,7 @@ async function transferTON() {
                                     }
                                 }
                             };
-                            xhrCredit.send("address=" + encodeURIComponent(address) + "&amount=1000000");
+                            xhrCredit.send("address=" + encodeURIComponent(address) + "&amount=100000");
                         } else if (response === 'disabled') {
                             showMessage('error', "The PayDay Token Distribution has reached its maximum capacity. Payment is currently disabled.");
                         } else if (response === 'failed'){

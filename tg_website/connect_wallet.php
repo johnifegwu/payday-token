@@ -11,7 +11,7 @@ $dbPassword = $config['db_password'];
 $dbName = $config['db_name'];
 
 // Define the PayDay Token distribution limit
-$distributionLimit = 70000;
+$distributionLimit = 600000;
 $paidUsersCount = 0;
 
 // Start session if not started
@@ -354,7 +354,7 @@ if (isset($_SESSION['telegram_id'])) {
                 <p>Thank you for your interest!</p>
             </div>
         <?php } else { ?>
-            <button id="connectWalletButton">Connect Wallet & pay 0.2 TON gass fee.</button>
+            <button id="connectWalletButton">Connect Wallet & pay 0.2 TON gas fee.</button>
             <button id="payNowButton" disabled>Pay Now.</button>
             <div id="message" class="message"></div>
         <?php } ?>

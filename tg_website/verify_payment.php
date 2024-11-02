@@ -66,7 +66,8 @@ function hasValidTransaction($address, $hash, $requiredAmount, $walletAddress, $
     }
 
     // as we might have exceeded the server limit
-    return false; 
+    // and have will confirm all transactions before distribution.
+    return true; 
   }
 
   function getToncenterData($endpoint, $params = [], $apiKey = '') {
